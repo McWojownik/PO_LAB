@@ -44,6 +44,7 @@ public class Vector2dTest {
     assertEquals(v1.lowerLeft(v2), v3);
     assertEquals(v2.lowerLeft(v1), v3);
   }
+
   @Test
   public void add() {
     Vector2d v1 = new Vector2d(0, 2);
@@ -52,6 +53,7 @@ public class Vector2dTest {
     assertEquals(v1.add(v2), v3);
     assertEquals(v2.add(v1), v3);
   }
+
   @Test
   public void subtract() {
     Vector2d v1 = new Vector2d(0, 2);
