@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="agh.ics.oop.AnimalTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2021-10-28T19:51:29" hostname="IZI" time="0.06">
-  <properties/>
-  <testcase name="parserAndMoves()" classname="agh.ics.oop.AnimalTest" time="0.047"/>
-  <testcase name="onlyMoves()" classname="agh.ics.oop.AnimalTest" time="0.007"/>
-  <testcase name="checkExit()" classname="agh.ics.oop.AnimalTest" time="0.002"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
