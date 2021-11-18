@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="agh.ics.oop.SimulationEngineTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-11-18T13:21:00" hostname="IZI" time="0.036">
+<testsuite name="agh.ics.oop.SimulationEngineTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2021-11-18T14:40:15" hostname="IZI" time="0.033">
   <properties/>
-  <testcase name="putAnimalsAndRun()" classname="agh.ics.oop.SimulationEngineTest" time="0.036"/>
-  <system-out><![CDATA[[S, N]
-]]></system-out>
+  <testcase name="putAnimalsAndRun()" classname="agh.ics.oop.SimulationEngineTest" time="0.033"/>
+  <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

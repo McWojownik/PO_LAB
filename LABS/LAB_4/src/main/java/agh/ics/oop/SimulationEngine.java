@@ -42,6 +42,5 @@ public class SimulationEngine implements IEngine {
 //      out.println(moves[i]);
 //      out.println(this.map.toString());
     }
-    out.println(animals);
   }
 }
