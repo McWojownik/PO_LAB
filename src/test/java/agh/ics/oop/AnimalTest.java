@@ -6,19 +6,22 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AnimalTest {
   @Test
-  public void creatingAnimal() {
+  public void creatingAnimalOnMap() {
     IWorldMap map = new RectangularMap(10, 5);
     Vector2d v1 = new Vector2d(2, 2);
+    Vector2d v2 = new Vector2d(2, 1);
     Animal a1 = new Animal(map, v1);
     map.place(a1);
-    assertEquals(1, map.getAnimals().size());
-    Vector2d v2 = new Vector2d(2, 1);
+    assertTrue(map.isOccupied(v1));
     Animal a2 = new Animal(map, v2);
     Animal a3 = new Animal(map, v1);
     map.place(a2);
-    assertEquals(2, map.getAnimals().size());
+    a1.move(MoveDirection.FORWARD);
+    assertFalse(map.isOccupied(v1));
     map.place(a3);
-    assertEquals(2, map.getAnimals().size());
+    assertTrue(map.isOccupied(v1));
+    assertEquals(a2, map.objectAt(v2));
+    assertEquals(a1, map.objectAt(v1.add(new Vector2d(0, 1))));
   }
 
   @Test

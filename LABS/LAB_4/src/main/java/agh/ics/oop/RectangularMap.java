@@ -3,21 +3,16 @@ package agh.ics.oop;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.System.out;
-
 public class RectangularMap implements IWorldMap {
   private final int width;
-  private final int height;
-  private final List<Animal> animals = new ArrayList<>();
+  public final int height;
+  private final List<Animal> animals;
   private final MapVisualizer visualizer = new MapVisualizer(this);
 
   public RectangularMap(int width, int height) {
     this.width = width;
     this.height = height;
-  }
-
-  public List<Animal> getAnimals() {
-    return this.animals;
+    this.animals = new ArrayList<>();
   }
 
   public String toString() {
