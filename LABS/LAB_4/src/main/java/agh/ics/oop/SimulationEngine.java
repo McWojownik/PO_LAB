@@ -7,12 +7,12 @@ import static java.lang.System.out;
 
 public class SimulationEngine implements IEngine {
   private final MoveDirection[] moves;
-  private final RectangularMap map;
+  private final IWorldMap map;
   private final List<Animal> animals;
 
   public SimulationEngine(MoveDirection[] moves, IWorldMap map, Vector2d[] startingPoints) {
     this.moves = moves;
-    this.map = (RectangularMap) map;
+    this.map = map;
     this.animals = new ArrayList<>();
     this.putAnimals(startingPoints);
   }

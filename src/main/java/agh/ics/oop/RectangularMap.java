@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RectangularMap implements IWorldMap {
   private final int width;
-  public final int height;
+  private final int height;
   private final List<Animal> animals;
   private final MapVisualizer visualizer = new MapVisualizer(this);
 
@@ -26,7 +26,7 @@ public class RectangularMap implements IWorldMap {
 
   @Override
   public boolean place(Animal animal) {
-    if (!isOccupied(animal.position)) {
+    if (!isOccupied(animal.getPosition())) {
       this.animals.add(animal);
       return true;
     }

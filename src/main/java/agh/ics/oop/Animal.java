@@ -3,7 +3,7 @@ package agh.ics.oop;
 public class Animal {
   private MapDirection orientation = MapDirection.NORTH;
   private final IWorldMap map;
-  protected Vector2d position;
+  private Vector2d position;
 
   public Animal(IWorldMap map, Vector2d initialPosition) {
     this.map = map;

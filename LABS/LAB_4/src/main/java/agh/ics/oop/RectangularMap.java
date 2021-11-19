@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RectangularMap implements IWorldMap {
   private final int width;
-  public final int height;
+  private final int height;
   private final List<Animal> animals;
   private final MapVisualizer visualizer = new MapVisualizer(this);
 
