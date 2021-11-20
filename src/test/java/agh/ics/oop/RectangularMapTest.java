@@ -54,5 +54,29 @@ public class RectangularMapTest {
     Vector2d v2 = new Vector2d(4, 4);
     assertNull(map.objectAt(v2));
     assertEquals(a1, map.objectAt(v1));
+    a1.move(MoveDirection.RIGHT);
+    a1.move(MoveDirection.FORWARD);
+    assertEquals(a1, map.objectAt(v1.add(new Vector2d(1, 0))));
+  }
+
+  @Test
+  public void engine() {
+    MoveDirection[] directions = {MoveDirection.LEFT, MoveDirection.LEFT, MoveDirection.FORWARD, MoveDirection.FORWARD};
+    IWorldMap map = new RectangularMap(10, 5);
+    Vector2d v1 = new Vector2d(2, 2);
+    Vector2d v2 = new Vector2d(3, 4);
+    Vector2d[] positions = {v1, v2};
+    IEngine engine = new SimulationEngine(directions, map, positions);
+    engine.run();
+    Vector2d v3 = new Vector2d(1, 2);
+    Vector2d v4 = new Vector2d(2, 4);
+    Animal animal = new Animal(map, v3);
+    assertFalse(map.place(animal));
+    animal = new Animal(map, v4);
+    assertFalse(map.place(animal));
+    animal = new Animal(map, v1);
+    assertTrue(map.place(animal));
+    animal = new Animal(map, v2);
+    assertTrue(map.place(animal));
   }
 }
