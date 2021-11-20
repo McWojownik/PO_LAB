@@ -1,56 +1,41 @@
 package agh.ics.oop;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class RectangularMap implements IWorldMap {
+public class RectangularMap extends AbstractWorldMap {
   private final int width;
   private final int height;
-  private final List<Animal> animals;
-  private final MapVisualizer visualizer = new MapVisualizer(this);
 
   public RectangularMap(int width, int height) {
+    super();
     this.width = width;
     this.height = height;
-    this.animals = new ArrayList<>();
   }
 
   public String toString() {
-    return visualizer.draw(new Vector2d(0, 0), new Vector2d(this.width - 1, this.height - 1));
+    return super.toString(new Vector2d(0, 0), new Vector2d(this.width - 1, this.height - 1));
   }
 
   @Override
   public boolean canMoveTo(Vector2d position) {
-    return position.y < this.height && position.y >= 0 && position.x < this.width && position.x >= 0 && !isOccupied(position);
+    return position.y < this.height && position.y >= 0 && position.x < this.width && position.x >= 0;
   }
 
   @Override
   public boolean place(Animal animal) {
-    if (!isOccupied(animal.getPosition())) {
-      this.animals.add(animal);
-      return true;
-    }
-    return false;
+    Vector2d animalPosition = animal.getPosition();
+    if (!canMoveTo(animalPosition))
+      return false;
+    return super.place(animal);
   }
 
   @Override
   public boolean isOccupied(Vector2d position) {
-    if (position.y >= this.height || position.y < 0 || position.x >= this.width || position.x < 0) {
+    if (!canMoveTo(position))
       return true;
-    }
-    for (Animal animal : this.animals) {
-      if (animal.isAt(position))
-        return true;
-    }
-    return false;
+    return super.isOccupiedABS(position);
   }
 
   @Override
   public Object objectAt(Vector2d position) {
-    for (Animal animal : this.animals) {
-      if (animal.isAt(position))
-        return animal;
-    }
-    return null;
+    return super.objectAt(position);
   }
 }

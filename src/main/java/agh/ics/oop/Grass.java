@@ -7,11 +7,15 @@ public class Grass {
     this.position = position;
   }
 
-  public Vector2d getPosition() {
+  protected Vector2d getPosition() {
     return this.position;
   }
 
   public String toString() {
     return "*";
+  }
+
+  protected boolean isAt(Vector2d position) {
+    return this.position.equals(position);
   }
 }
