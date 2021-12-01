@@ -38,10 +38,11 @@ public class Animal implements IMapElement {
     this.observers.remove(observer);
   }
 
-  void positionChanged(Vector2d oldPosition, Vector2d newPosition){
+  boolean positionChanged(Vector2d oldPosition, Vector2d newPosition){
     for(IPositionChangeObserver observer:observers){
-      observer.positionChanged(oldPosition, newPosition);
+      observer.positionChanged(oldPosition, newPosition); // observer.positionChanged(oldPosition, newPosition) zwraca na ten moment zawsze true
     }
+    return true;
   }
 
   protected MapDirection getOrientation() {
@@ -53,15 +54,15 @@ public class Animal implements IMapElement {
       case FORWARD -> {
         Vector2d position = this.position.add(this.orientation.toUnitVector());
         if (this.map.canMoveTo(position)) {
-          this.positionChanged(this.position, position);
-          this.position = position;
+          if(this.positionChanged(this.position, position))
+            this.position = position;
         }
       }
       case BACKWARD -> {
         Vector2d position = this.position.subtract(this.orientation.toUnitVector());
         if (this.map.canMoveTo(position)){
-          this.positionChanged(this.position, position);
-          this.position = position;
+          if(this.positionChanged(this.position, position))
+            this.position = position;
         }
       }
       case RIGHT -> this.orientation = this.orientation.next();
