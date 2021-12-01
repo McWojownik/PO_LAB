@@ -26,16 +26,6 @@ public class RectangularMap extends AbstractWorldMap {
       return false;
     return super.place(animal);
   }
-
-  @Override
-  public boolean isOccupied(Vector2d position) {
-    return super.isOccupiedABS(position);
-  }
-
-  @Override
-  public Object objectAt(Vector2d position) {
-    return super.objectAt(position);
-  }
 }
 
 // WCZESNIEJSZA MAPA NIE DZIEDZICZACA Z AbstractWorldMap

@@ -17,22 +17,15 @@ abstract class AbstractWorldMap implements IWorldMap {
 
   public boolean place(Animal animal) {
     Vector2d animalPosition = animal.getPosition();
-    if (this.isOccupiedABS(animalPosition))
-      return false;
+    for (Animal animal2 : this.animals) {
+      if (animal2.isAt(animalPosition))
+        return false;
+    }
     this.animals.add(animal);
     return true;
-//    PODCZAS WYWOLANIA this.isOccupied WYWOLYWANA BYLA METODA Z KLASY DZIEDZICZACEJ GrassField, KTORA BLOKOWALA POSTAWIENIE ZWIERZAKA
-//    NA POZYCJI animalPosition, GDYZ BYLA ZAJETA PRZEZ KEPKE TRAWY, DLATEGO W TEJ KLASIE METODA this.isOccupiedABS MA KONCOWKE "ABS"
-//    EWENTUALNIE MOZNA WYKOWAC PONIZSZY KOD, A Z NAZWY METODY this.isOccupiedabs USUNAC KONCOWKE "ABS"
-//    for(Animal a: this.animals){
-//      if (a.isAt(animalPosition))
-//        return false;
-//    }
-//    this.animals.add(animal);
-//    return true;
   }
 
-  public boolean isOccupiedABS(Vector2d position) {
+  public boolean isOccupied(Vector2d position) {
     for (Animal animal : this.animals) {
       if (animal.isAt(position))
         return true;

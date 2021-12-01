@@ -63,7 +63,7 @@ public class GrassField extends AbstractWorldMap {
 
   @Override
   public boolean canMoveTo(Vector2d position) {
-    if (super.isOccupiedABS(position))
+    if (super.isOccupied(position))
       return false;
     this.updateMapEnd(position);
     return true;
@@ -80,7 +80,7 @@ public class GrassField extends AbstractWorldMap {
 
   @Override
   public boolean isOccupied(Vector2d position) {
-    if (super.isOccupiedABS(position))
+    if (super.isOccupied(position))
       return true;
     return grassOnField(position);
   }
