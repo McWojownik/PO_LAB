@@ -6,9 +6,9 @@ import java.util.List;
 // DO ZROBIENIA KIEDYS LAB_5_ZAD_12
 
 public class GrassField extends AbstractWorldMap {
-  protected List<Grass> grass= new ArrayList<>();;
-  private Vector2d leftBottom = new Vector2d(0, 0);
-  private Vector2d rightTop = new Vector2d(0, 0);
+  protected List<Grass> grass = new ArrayList<>();
+  private Vector2d leftBottom;
+  private Vector2d rightTop;
 
   public GrassField(int n) {
     super();
@@ -16,7 +16,7 @@ public class GrassField extends AbstractWorldMap {
   }
 
   public String toString() {
-    return super.toString(leftBottom, rightTop);
+    return super.toString(this.leftBottom, this.rightTop);
   }
 
   private void generateGrass(int n) {
@@ -28,29 +28,13 @@ public class GrassField extends AbstractWorldMap {
         Vector2d v = new Vector2d(x, y);
         if (!grassOnField(v)) {
           found = true;
-          if (this.grass.size() != 0)
-            this.updateMapEnd(v);
-          else {
-            this.leftBottom = v;
-            this.rightTop = v;
-          }
+          this.mapEnds.addElement(v);
           this.grass.add(new Grass(v));
         }
       }
     }
-  }
-
-  public void updateMapEnd(Vector2d v) {
-    int miniX = this.leftBottom.x;
-    int miniY = this.leftBottom.y;
-    int maxiX = this.rightTop.x;
-    int maxiY = this.rightTop.y;
-    miniX = Math.min(miniX, v.x);
-    miniY = Math.min(miniY, v.y);
-    maxiX = Math.max(maxiX, v.x);
-    maxiY = Math.max(maxiY, v.y);
-    this.leftBottom = new Vector2d(miniX, miniY);
-    this.rightTop = new Vector2d(maxiX, maxiY);
+    this.leftBottom = this.mapEnds.getLeftBottom();
+    this.rightTop = this.mapEnds.getRightTop();
   }
 
   private boolean grassOnField(Vector2d position) {
@@ -63,19 +47,16 @@ public class GrassField extends AbstractWorldMap {
 
   @Override
   public boolean canMoveTo(Vector2d position) {
-    if (super.isOccupied(position))
-      return false;
-    this.updateMapEnd(position);
-    return true;
+    return !super.isOccupied(position);
   }
 
   @Override
   public boolean place(Animal animal) {
-    if (super.place(animal)) {
-      this.updateMapEnd(animal.getPosition());
-      return true;
-    }
-    return false;
+    super.place(animal);
+    this.mapEnds.addElement(animal.getPosition());
+    this.leftBottom = this.mapEnds.getLeftBottom();
+    this.rightTop = this.mapEnds.getRightTop();
+    return true;
   }
 
   @Override
@@ -95,5 +76,12 @@ public class GrassField extends AbstractWorldMap {
         return grass;
     }
     return null;
+  }
+
+  public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+    this.mapEnds.positionChanged(oldPosition, newPosition);
+    this.leftBottom = this.mapEnds.getLeftBottom();
+    this.rightTop = this.mapEnds.getRightTop();
+    return super.positionChanged(oldPosition, newPosition);
   }
 }

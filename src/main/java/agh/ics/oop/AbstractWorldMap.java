@@ -6,8 +6,7 @@ import java.util.Map;
 abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
   protected Map<Vector2d, Animal> animals = new LinkedHashMap<>();
   private final MapVisualizer visualizer = new MapVisualizer(this);
-
-  public AbstractWorldMap() {}
+  protected MapBoundary mapEnds = new MapBoundary(this);
 
   public String toString(Vector2d leftBottom, Vector2d rightTop) {
     return visualizer.draw(leftBottom, rightTop);
@@ -15,8 +14,8 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
 
   public boolean place(Animal animal) {
     Vector2d animalPosition = animal.getPosition();
-    if(this.animals.get(animalPosition)!=null)
-      return false;
+    if (this.animals.get(animalPosition) != null)
+      throw new IllegalArgumentException("Position " + animalPosition.toString() + " is busy");
     this.animals.put(animalPosition, animal);
     return true;
   }
@@ -26,9 +25,7 @@ abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
   }
 
   public Object objectAt(Vector2d position) {
-    if(this.animals.get(position)!=null)
-      return this.animals.get(position);
-    return null;
+    return this.animals.get(position);
   }
 
   public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
