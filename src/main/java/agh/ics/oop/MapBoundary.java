@@ -41,20 +41,20 @@ public class MapBoundary implements IPositionChangeObserver {
     return true;
   }
 
-  public Vector2d getLeftBottom() {
-    Vector2d vXmin = setX.first();
-    Vector2d vYmin = setY.first();
-    return new Vector2d(vXmin.x, vYmin.y);
-  }
-
-  public Vector2d getRightTop() {
-    Vector2d vXmax = setX.last();
-    Vector2d vYmax = setY.last();
-    return new Vector2d(vXmax.x, vYmax.y);
-  }
+//  public Vector2d getLeftBottom() {
+//    Vector2d vXmin = setX.first();
+//    Vector2d vYmin = setY.first();
+//    return new Vector2d(vXmin.x, vYmin.y);
+//  }
+//
+//  public Vector2d getRightTop() {
+//    Vector2d vXmax = setX.last();
+//    Vector2d vYmax = setY.last();
+//    return new Vector2d(vXmax.x, vYmax.y);
+//  }
 
   @Override
-  public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
+  public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
     setX.remove(oldPosition);
     setY.remove(oldPosition);
     setX.add(newPosition);

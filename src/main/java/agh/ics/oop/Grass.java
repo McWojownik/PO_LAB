@@ -24,6 +24,6 @@ public class Grass implements IMapElement {
 
   @Override
   public String getImageSource() {
-    return "grass.png";
+    return "grass2.png";
   }
 }

@@ -56,4 +56,19 @@ public class RectangularMap extends AbstractWorldMap {
 
   }
 
+  @Override
+  public void clearDeadAnimals() {
+
+  }
+
+  @Override
+  public void allAnimalsEat() {
+
+  }
+
+  @Override
+  public void animalsCopulation() {
+
+  }
+
 }

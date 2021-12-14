@@ -39,11 +39,6 @@ public class GridVisualizer {
           if (obj != null) {
             GuiElementBox el = new GuiElementBox(obj.getImageSource());
             box.getChildren().add(el.getImage());
-            if (obj instanceof Animal) {
-              box.getChildren().add(el.addDescription("Z " + obj.getPosition().toString()));
-            } else {
-              box.getChildren().add(el.addDescription("Trawa"));
-            }
           }
           box.setAlignment(Pos.CENTER);
           this.grid.add(box, j - leftBottom.x + 1, rightTop.y - i + 1);

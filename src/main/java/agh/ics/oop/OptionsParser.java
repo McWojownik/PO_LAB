@@ -1,24 +1,32 @@
 package agh.ics.oop;
 
-import java.util.Arrays;
-
 public class OptionsParser {
-  public MoveDirection[] parse(String[] arr) {
-    MoveDirection[] instructions = new MoveDirection[arr.length];
-    int index = 0;
-    for (String s : arr) {
-      switch (s) {
-        case "f", "forward" -> instructions[index++] = MoveDirection.FORWARD;
-        case "b", "backward" -> instructions[index++] = MoveDirection.BACKWARD;
-        case "r", "right" -> instructions[index++] = MoveDirection.RIGHT;
-        case "l", "left" -> instructions[index++] = MoveDirection.LEFT;
-        default -> throw new IllegalArgumentException(s + " is not legal move specification");
-      }
-    }
-    instructions = Arrays.copyOfRange(instructions, 0, index);
-    return instructions;
+
+  public MoveDirection numberToMoveDirection(int direction) {
+    return switch (direction) {
+      case 0 -> MoveDirection.FORWARD;
+      case 1 -> MoveDirection.FORWARD_RIGHT;
+      case 2 -> MoveDirection.RIGHT;
+      case 3 -> MoveDirection.BACKWARD_RIGHT;
+      case 4 -> MoveDirection.BACKWARD;
+      case 5 -> MoveDirection.BACKWARD_LEFT;
+      case 6 -> MoveDirection.LEFT;
+      case 7 -> MoveDirection.FORWARD_LEFT;
+      default -> throw new IllegalArgumentException(direction + " is not legal move direction");
+    };
+  }
+
+  public MapDirection numberToMapDirection(int direction) {
+    return switch (direction) {
+      case 0 -> MapDirection.NORTH;
+      case 1 -> MapDirection.NORTH_EAST;
+      case 2 -> MapDirection.EAST;
+      case 3 -> MapDirection.SOUTH_EAST;
+      case 4 -> MapDirection.SOUTH;
+      case 5 -> MapDirection.SOUTH_WEST;
+      case 6 -> MapDirection.WEST;
+      case 7 -> MapDirection.NORTH_WEST;
+      default -> throw new IllegalArgumentException(direction + " is not legal map direction");
+    };
   }
 }
-//zad 10        PAMIEC  CZAS
-//1) Tablica2D    -      +
-//2) Lista        +      -

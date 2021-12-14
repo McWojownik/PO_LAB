@@ -7,9 +7,8 @@ import java.util.List;
 
 
 public class SimulationEngine implements IEngine, Runnable {
-  private MoveDirection[] moves = {};
   private final AbstractWorldMap map;
-  private final List<Animal> animals = new ArrayList<>();
+//  private final List<Animal> animals = new ArrayList<>();
   protected final List<App> observers = new ArrayList<>();
   protected int moveDelay;
 
@@ -17,10 +16,6 @@ public class SimulationEngine implements IEngine, Runnable {
     this.map = map;
     this.putAnimals(this.createStartingPoints(animalsAtStart));
   }
-
-//  public List<Animal> getAnimals() {
-//    return this.animals;
-//  }
 
   private List<Vector2d> createStartingPoints(int animalsAtStart) {
     List<Vector2d> startingPoints = new ArrayList<>();
@@ -48,14 +43,12 @@ public class SimulationEngine implements IEngine, Runnable {
 
   private void putAnimals(List<Vector2d> startingPoints) {
     for (Vector2d vector : startingPoints) {
-      Animal animal = new Animal(this.map, vector);
-      if (this.map.place(animal))
-        this.animals.add(animal);
+      Genes genes = new Genes();
+      Animal animal = new Animal(this.map, vector, this.map.startEnergy, genes);
+      this.map.place(animal);
+//      if (this.map.place(animal))
+//        this.animals.add(animal);
     }
-  }
-
-  public void setMoves(String[] moves) {
-    this.moves = new OptionsParser().parse(moves);
   }
 
   public void addObserver(App gui) {
@@ -68,22 +61,20 @@ public class SimulationEngine implements IEngine, Runnable {
 
   @Override
   public void run() {
-    int countAnimals = this.animals.size();
-    int numberOfMoves = this.moves.length;
-//    for (int i = 0; i < numberOfMoves; i++) {
     while (true) {
       try {
         Thread.sleep(this.moveDelay);
       } catch (InterruptedException e) {
         System.out.print("Something is wrong");
       }
-//      animals.get(i % countAnimals).move(moves[i]);
+      this.map.clearDeadAnimals();
       this.map.moveAllAnimals();
+      this.map.allAnimalsEat();
+      this.map.animalsCopulation();
       this.map.generateDayGrass();
       for (App GUI : this.observers) {
         GUI.positionChanged();
       }
     }
-//    }
   }
 }

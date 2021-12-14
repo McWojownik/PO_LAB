@@ -46,4 +46,10 @@ public interface IWorldMap {
   void moveAllAnimals();
 
   void generateDayGrass();
+
+  void clearDeadAnimals();
+
+  void allAnimalsEat();
+
+  void animalsCopulation();
 }

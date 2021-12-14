@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import static java.lang.System.out;
 
 public class App extends Application {
-  private GrassField map;
+  private AbstractWorldMap map;
   private SimulationEngine engine;
   private GridVisualizer mapVisualizer;
   private GridPane grid;
@@ -36,35 +36,32 @@ public class App extends Application {
     HBox widthBox = new HBox(new Text("WIDTH: "), width);
     TextField height = new TextField("11");
     HBox heightBox = new HBox(new Text("HEIGHT: "), height);
-    TextField startEnergy = new TextField("20");
+    TextField startEnergy = new TextField("400");
     HBox startEnergyBox = new HBox(new Text("START ENERGY: "), startEnergy);
     TextField moveEnergy = new TextField("20");
     HBox moveEnergyBox = new HBox(new Text("MOVE ENERGY: "), moveEnergy);
     TextField animalsAtStart = new TextField("2");
     HBox animalsAtStartBox = new HBox(new Text("NUMBER OF ANIMALS: "), animalsAtStart);
-    TextField plantEnergy = new TextField("20");
+    TextField plantEnergy = new TextField("100");
     HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), plantEnergy);
     TextField jungleRatio = new TextField("20");
     HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
     Button startButton = new Button("START");
     VBox settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleRatioBox, startButton);
-    Scene scene = new Scene(settings, 800, 800);
+    Scene scene = new Scene(settings, 400, 400);
     primaryStage.setScene(scene);
     primaryStage.show();
     startButton.setOnAction((e) -> {
       this.map = new GrassField(Integer.parseInt(width.getText()),Integer.parseInt(height.getText()),Integer.parseInt(startEnergy.getText()),Integer.parseInt(moveEnergy.getText()),Integer.parseInt(animalsAtStart.getText()),Integer.parseInt(plantEnergy.getText()),Integer.parseInt(jungleRatio.getText()));
       this.grid.getChildren().clear();
       this.mapVisualizer = new GridVisualizer(this.map, this.grid);
-      this.grid.setGridLinesVisible(true);
+//      this.grid.setGridLinesVisible(true);
       Vector2d leftBottom = new Vector2d(0,0);
       Vector2d rightTop = new Vector2d(Integer.parseInt(width.getText())-1,Integer.parseInt(height.getText())-1);
       try {
         this.engine = new SimulationEngine(this.map, Integer.parseInt(animalsAtStart.getText()));
         this.engine.addObserver(this);
         this.engine.setDayTimeChange(600);
-//        String moves = "f f l l r f f r r b b";
-//        String moves = "f f f f f f f f f f f f f f f f f f f f f f";
-//        engine.setMoves(moves.split(" "));
         this.mapVisualizer.draw(leftBottom, rightTop);
         Scene scene2 = new Scene(this.grid);
         primaryStage.setScene(scene2);
