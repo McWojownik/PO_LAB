@@ -40,4 +40,10 @@ public interface IWorldMap {
    * @return Object or null if the position is not occupied.
    */
   Object objectAt(Vector2d position);
+
+  boolean isJungle(Vector2d position);
+
+  void moveAllAnimals();
+
+  void generateDayGrass();
 }

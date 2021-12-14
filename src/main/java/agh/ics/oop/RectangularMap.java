@@ -41,4 +41,19 @@ public class RectangularMap extends AbstractWorldMap {
     }
   }
 
+  @Override
+  public boolean isJungle(Vector2d position) {
+    return false;
+  }
+
+  @Override
+  public void moveAllAnimals() {
+
+  }
+
+  @Override
+  public void generateDayGrass() {
+
+  }
+
 }

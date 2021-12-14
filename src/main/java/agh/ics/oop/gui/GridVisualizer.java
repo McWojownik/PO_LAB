@@ -30,7 +30,12 @@ public class GridVisualizer {
       for (int j = leftBottom.x; j <= rightTop.x + 1; j++) {
         if (j <= rightTop.x) {
           VBox box = new VBox();
-          IMapElement obj = (IMapElement) this.getObject(new Vector2d(j, i));
+          Vector2d vector = new Vector2d(j, i);
+          IMapElement obj = (IMapElement) this.getObject(vector);
+          if (this.map.isJungle(vector))
+            box.setStyle("-fx-background-color: #004500;");
+          else
+            box.setStyle("-fx-background-color: #00FF00;");
           if (obj != null) {
             GuiElementBox el = new GuiElementBox(obj.getImageSource());
             box.getChildren().add(el.getImage());

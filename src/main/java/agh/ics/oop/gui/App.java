@@ -3,12 +3,14 @@ package agh.ics.oop.gui;
 import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
@@ -16,64 +18,70 @@ import java.io.FileNotFoundException;
 import static java.lang.System.out;
 
 public class App extends Application {
-  private final AbstractWorldMap map;
+  private GrassField map;
   private SimulationEngine engine;
   private GridVisualizer mapVisualizer;
   private GridPane grid;
-//  private RectangularMap map;
-//  private GrassField map;
 
   public App() {
-//    this.map = new RectangularMap(10, 5);
-//    b b r l f f
-    this.map = new GrassField(10);
-//    l r f f f f f f f f f f r r f f f f f f
   }
 
   public void init() {
-    try {
-//      MoveDirection[] directions = new OptionsParser().parse(getParameters().getRaw().toArray(new String[0]));
-      Vector2d v1 = new Vector2d(2, 2);
-      Vector2d v2 = new Vector2d(3, 4);
-      Vector2d[] positions = {v1, v2};
-      this.engine = new SimulationEngine(this.map, positions);
-      this.engine.addObserver(this);
-      this.engine.setDayTimeChange(600);
-    } catch (IllegalArgumentException ex) {
-      out.println(ex.getMessage());
-    }
   }
 
   @Override
   public void start(Stage primaryStage) throws Exception {
     this.grid = new GridPane();
-    Button start = new Button("Start");
-    TextField arguments = new TextField();
-    HBox hbox = new HBox(start, arguments);
-    this.grid.setGridLinesVisible(true);
-    VBox vbox = new VBox(hbox, this.grid);
-    this.mapVisualizer = new GridVisualizer(this.map, this.grid);
-    Vector2d leftBottom = this.map.mapEnds.getLeftBottom();
-    Vector2d rightTop = this.map.mapEnds.getRightTop();
-    this.mapVisualizer.draw(leftBottom, rightTop);
-    Scene scene = new Scene(vbox, 600, 600);
+    TextField width = new TextField("11");
+    HBox widthBox = new HBox(new Text("WIDTH: "), width);
+    TextField height = new TextField("11");
+    HBox heightBox = new HBox(new Text("HEIGHT: "), height);
+    TextField startEnergy = new TextField("20");
+    HBox startEnergyBox = new HBox(new Text("START ENERGY: "), startEnergy);
+    TextField moveEnergy = new TextField("20");
+    HBox moveEnergyBox = new HBox(new Text("MOVE ENERGY: "), moveEnergy);
+    TextField animalsAtStart = new TextField("2");
+    HBox animalsAtStartBox = new HBox(new Text("NUMBER OF ANIMALS: "), animalsAtStart);
+    TextField plantEnergy = new TextField("20");
+    HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), plantEnergy);
+    TextField jungleRatio = new TextField("20");
+    HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
+    Button startButton = new Button("START");
+    VBox settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleRatioBox, startButton);
+    Scene scene = new Scene(settings, 800, 800);
     primaryStage.setScene(scene);
     primaryStage.show();
-    start.setOnAction((e) -> {
-      engine.setMoves(arguments.getText().split(" "));
-      arguments.clear();
-      Thread thread = new Thread(this.engine);
-      thread.start();
+    startButton.setOnAction((e) -> {
+      this.map = new GrassField(Integer.parseInt(width.getText()),Integer.parseInt(height.getText()),Integer.parseInt(startEnergy.getText()),Integer.parseInt(moveEnergy.getText()),Integer.parseInt(animalsAtStart.getText()),Integer.parseInt(plantEnergy.getText()),Integer.parseInt(jungleRatio.getText()));
+      this.grid.getChildren().clear();
+      this.mapVisualizer = new GridVisualizer(this.map, this.grid);
+      this.grid.setGridLinesVisible(true);
+      Vector2d leftBottom = new Vector2d(0,0);
+      Vector2d rightTop = new Vector2d(Integer.parseInt(width.getText())-1,Integer.parseInt(height.getText())-1);
+      try {
+        this.engine = new SimulationEngine(this.map, Integer.parseInt(animalsAtStart.getText()));
+        this.engine.addObserver(this);
+        this.engine.setDayTimeChange(600);
+//        String moves = "f f l l r f f r r b b";
+//        String moves = "f f f f f f f f f f f f f f f f f f f f f f";
+//        engine.setMoves(moves.split(" "));
+        this.mapVisualizer.draw(leftBottom, rightTop);
+        Scene scene2 = new Scene(this.grid);
+        primaryStage.setScene(scene2);
+        primaryStage.show();
+        Thread thread = new Thread(this.engine);
+        thread.start();
+      } catch (FileNotFoundException ex) {
+        ex.printStackTrace();
+      }
     });
   }
 
   public void positionChanged() {
     Platform.runLater(() -> {
       this.grid.getChildren().clear();
-      Vector2d leftBottom = this.map.mapEnds.getLeftBottom();
-      Vector2d rightTop = this.map.mapEnds.getRightTop();
       try {
-        this.mapVisualizer.draw(leftBottom, rightTop);
+        this.mapVisualizer.draw(this.map.getLeftBottom(), this.map.getRightTop());
       } catch (FileNotFoundException e) {
         e.printStackTrace();
       }

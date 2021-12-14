@@ -4,9 +4,15 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
+  protected Vector2d leftBottom;
+  protected Vector2d rightTop;
   protected Map<Vector2d, Animal> animals = new LinkedHashMap<>();
   public final MapVisualizer visualizer = new MapVisualizer(this);
   public MapBoundary mapEnds = new MapBoundary(this);
+
+  public Map<Vector2d, Animal> getAnimals(){
+    return this.animals;
+  }
 
   public String toString(Vector2d leftBottom, Vector2d rightTop) {
     return visualizer.draw(leftBottom, rightTop);

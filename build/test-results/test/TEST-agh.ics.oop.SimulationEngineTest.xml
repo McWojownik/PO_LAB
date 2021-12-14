@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="agh.ics.oop.SimulationEngineTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2021-12-13T19:02:51" hostname="IZI" time="0.046">
+<testsuite name="agh.ics.oop.SimulationEngineTest" tests="1" skipped="0" failures="1" errors="0" timestamp="2021-12-13T19:15:20" hostname="IZI" time="0.054">
   <properties/>
-  <testcase name="putAnimalsAndRun()" classname="agh.ics.oop.SimulationEngineTest" time="0.046">
+  <testcase name="putAnimalsAndRun()" classname="agh.ics.oop.SimulationEngineTest" time="0.054">
     <failure message="java.lang.IllegalArgumentException: You want to place animal beyond map" type="java.lang.IllegalArgumentException">java.lang.IllegalArgumentException: You want to place animal beyond map
 	at agh.ics.oop.RectangularMap.canMoveTo(RectangularMap.java:27)
-	at agh.ics.oop.Animal.move(Animal.java:68)
+	at agh.ics.oop.Animal.move(Animal.java:67)
 	at agh.ics.oop.SimulationEngine.run(SimulationEngine.java:59)
 	at agh.ics.oop.SimulationEngineTest.putAnimalsAndRun(SimulationEngineTest.java:24)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
