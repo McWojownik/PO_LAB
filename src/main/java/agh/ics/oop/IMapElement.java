@@ -5,7 +5,7 @@ public interface IMapElement {
 
   String toString();
 
-  boolean isAt(Vector2d position);
-
-  String getImageSource();
+//  boolean isAt(Vector2d position);
+//
+//  String getImageSource();
 }

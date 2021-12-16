@@ -8,7 +8,7 @@ public class Animal implements IMapElement {
   private final AbstractWorldMap map;
   private Vector2d position;
   private final List<IPositionChangeObserver> observers = new ArrayList<>();
-//  private int[] genes = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7, 7, 7, 7};
+  //  private int[] genes = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7, 7, 7, 7};
   private final Genes genes;
   protected int energy;
 
@@ -16,9 +16,13 @@ public class Animal implements IMapElement {
     this.map = map;
     this.energy = startEnergy;
     this.position = initialPosition;
-    this.orientation = new OptionsParser().numberToMapDirection((int) (Math.random()*8));
+    this.orientation = new OptionsParser().numberToMapDirection((int) (Math.random() * 8));
     this.genes = genes;
     this.addObserver(map);
+  }
+
+  protected MapDirection getOrientation() {
+    return this.orientation;
   }
 
   public MoveDirection getNextAnimalMove() {
@@ -33,7 +37,7 @@ public class Animal implements IMapElement {
     return this.energy >= this.map.startEnergy / 2;
   }
 
-  public int[] getGenesArr(){
+  public int[] getGenesArr() {
     return this.genes.getAnimalGenes();
   }
 
@@ -47,22 +51,22 @@ public class Animal implements IMapElement {
     return this.position;
   }
 
-  @Override
-  public boolean isAt(Vector2d position) {
-    return this.position.equals(position);
-  }
-
-  @Override
-  public String getImageSource() {
-    return "up.png";
-//    return switch (this.toString()) {
-//      case "N" -> "up.png";
-//      case "E" -> "right.png";
-//      case "S" -> "down.png";
-//      case "W" -> "left.png";
-//      default -> "";
-//    };
-  }
+//  @Override
+//  public boolean isAt(Vector2d position) {
+//    return this.position.equals(position);
+//  }
+//
+//  @Override
+//  public String getImageSource() {
+//    return "up.png";
+////    return switch (this.toString()) {
+////      case "N" -> "up.png";
+////      case "E" -> "right.png";
+////      case "S" -> "down.png";
+////      case "W" -> "left.png";
+////      default -> "";
+////    };
+//  }
 
   public void addObserver(IPositionChangeObserver observer) {
     this.observers.add(observer);
@@ -79,27 +83,15 @@ public class Animal implements IMapElement {
     return true;
   }
 
-  protected MapDirection getOrientation() {
-    return this.orientation;
-  }
-
   protected void move(MoveDirection direction) {
     switch (direction) {
       case FORWARD -> {
         Vector2d position = this.position.add(this.orientation.toUnitVector());
-        if (this.map.canMoveTo(position)) {
-          if (this.positionChanged(this.position, position)) {
-            this.position = position;
-          }
-        }
+        realMove(position);
       }
       case BACKWARD -> {
         Vector2d position = this.position.subtract(this.orientation.toUnitVector());
-        if (this.map.canMoveTo(position)) {
-          if (this.positionChanged(this.position, position)) {
-            this.position = position;
-          }
-        }
+        realMove(position);
       }
       case FORWARD_RIGHT -> {
         this.orientation = this.orientation.next();
@@ -127,5 +119,40 @@ public class Animal implements IMapElement {
       }
     }
     this.energy -= this.map.moveEnergy;
+  }
+
+  private void realMove(Vector2d position) {
+    if (this.map.canMoveTo(position)) {
+      if (this.positionChanged(this.position, position))
+        this.position = position;
+    }
+    else{
+      if (this.map.canMoveBeyondMap()) {
+        Vector2d vector = this.map.moveBeyondMapVector(position);
+        position = this.position.add(vector);
+        if (this.positionChanged(this.position, position))
+          this.position = position;
+      }
+    }
+  }
+
+
+  public String getAnimalColor() {
+    int energy = this.energy;
+    if (energy < 0.4 * this.map.startEnergy)
+      return "e6cd17";
+    if (energy < 0.8 * this.map.startEnergy)
+      return "cf7632";
+    if (energy < 1.2 * this.map.startEnergy)
+      return "fa6b37";
+    if (energy < 1.6 * this.map.startEnergy)
+      return "ed4d13";
+    if (energy < 2 * this.map.startEnergy)
+      return "ff3b3b";
+    if (energy < 4 * this.map.startEnergy)
+      return "ff0000";
+    if (energy < 8 * this.map.startEnergy)
+      return "870000";
+    return "e8138f";
   }
 }

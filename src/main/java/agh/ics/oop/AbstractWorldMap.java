@@ -1,8 +1,6 @@
 package agh.ics.oop;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObserver {
   protected int width;
@@ -13,17 +11,23 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int jungleRatio;
   protected Vector2d leftBottom;
   protected Vector2d rightTop;
+  protected Map<Vector2d, Grass> grassHash = new LinkedHashMap<>();
   protected Map<Vector2d, LinkedList<Animal>> animalsHash = new LinkedHashMap<>();
   protected LinkedList<Animal> animalsList = new LinkedList<>();
-  public final MapVisualizer visualizer = new MapVisualizer(this);
-  public MapBoundary mapEnds = new MapBoundary(this);
+  protected Vector2d jungleLeftBottom;
+  protected Vector2d jungleRightTop;
 
-  public Map<Vector2d, LinkedList<Animal>> getAnimalsHash() {
-    return this.animalsHash;
-  }
 
-  public LinkedList<Animal> getAnimalsList() {
-    return this.animalsList;
+  public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleRatio) {
+    this.width = width;
+    this.height = height;
+    this.startEnergy = startEnergy;
+    this.moveEnergy = moveEnergy;
+    this.plantEnergy = plantEnergy;
+    this.jungleRatio = jungleRatio;
+    this.leftBottom = new Vector2d(0, 0);
+    this.rightTop = new Vector2d(this.width - 1, this.height - 1);
+    this.generateJungle();
   }
 
   public Vector2d getLeftBottom() {
@@ -34,27 +38,183 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     return this.rightTop;
   }
 
-  public String toString(Vector2d leftBottom, Vector2d rightTop) {
-    return visualizer.draw(leftBottom, rightTop);
+  public Map<Vector2d, LinkedList<Animal>> getAnimalsHash() {
+    return this.animalsHash;
   }
 
-  public boolean place(Animal animal) {
+  public LinkedList<Animal> getAnimalsList() {
+    return this.animalsList;
+  }
+
+  @Override
+  public boolean canMoveTo(Vector2d position) {
+    return position.precedes(this.rightTop) && position.follows(this.leftBottom);
+  }
+
+  @Override
+  public void place(Animal animal) {
     Vector2d animalPosition = animal.getPosition();
-//    if (this.animals.get(animalPosition) != null)
-//      throw new IllegalArgumentException("Position " + animalPosition.toString() + " is busy");
-//    this.animals.put(animalPosition, animal);
     this.addAnimal(animal, animalPosition);
     this.animalsList.push(animal);
-    return true;
+  }
+
+  @Override
+  public boolean isOccupied(Vector2d position) {
+    if (this.animalsHash.get(position) != null)
+      return true;
+    return this.grassOnField(position);
+  }
+
+  @Override
+  public Object objectAt(Vector2d position) {
+    LinkedList<Animal> list = this.animalsHash.get(position);
+    if (list != null) {
+      if (list.size() > 0) {
+        return list.getFirst();
+      } else { // SHOULD NOT HAPPEN
+//        this.animalsHash.remove(position);
+        throw new IllegalArgumentException("Position " + position.toString() + " shouldn't be in hashMap");
+      }
+    }
+    return this.getGrassOnField(position);
+  }
+
+  @Override
+  public String getStrongestAnimalColorOnField(Vector2d position) {
+    LinkedList<Animal> animalsAtPosition = this.animalsHash.get(position);
+    if (animalsAtPosition != null) {
+      Animal animal = animalsAtPosition.getFirst();
+      for (int i = 1; i < animalsAtPosition.size(); i++) {
+        Animal possiblyStronger = animalsAtPosition.get(i);
+        if (animal.energy < possiblyStronger.energy)
+          animal = possiblyStronger;
+      }
+      return animal.getAnimalColor();
+    }
+    throw new IllegalArgumentException("At " + position.toString() + " no animals");
+  }
+
+  @Override
+  public String getGrassColorOnField(Vector2d position) {
+    if (this.isJungle(position))
+      return "004500";
+    return "f7f774";
+  }
+
+  @Override
+  public void clearDeadAnimals() {
+    LinkedList<Animal> animalsList = this.getAnimalsList();
+    for (int i = animalsList.size() - 1; i >= 0; i--) {
+      Animal animal = animalsList.get(i);
+      if (animal.isDead()) {
+        animal.removeObserver(this);
+        this.deleteAnimal(animal);
+      }
+    }
+  }
+
+  @Override
+  public void moveAllAnimals() {
+    LinkedList<Animal> animalsList = this.getAnimalsList();
+//    Map<Vector2d, LinkedList<Animal>> animalsHash = super.getAnimalsHash();
+//    AtomicInteger total = new AtomicInteger();
+//    animalsHash.forEach((k, v) -> total.addAndGet(v.size()));
+//    System.out.println(total);
+    for (Animal animal : animalsList) {
+      MoveDirection nextMove = animal.getNextAnimalMove();
+      animal.move(nextMove);
+    }
+  }
+
+  @Override
+  public void allAnimalsEat() {
+    Map<Vector2d, LinkedList<Animal>> animalsHash = this.getAnimalsHash();
+    animalsHash.forEach((Vector2d vector, LinkedList<Animal> animalsAtPosition) -> {
+      if (animalsAtPosition.size() > 0) {
+        Grass grass = this.getGrassOnField(vector);
+        if (grass != null) {
+          Animal animalChoosen = animalsAtPosition.getFirst();
+          int count = 1;
+          for (int i = 1; i < animalsAtPosition.size(); i++) {
+            Animal animal = animalsAtPosition.get(i);
+            if (animalChoosen.energy < animal.energy) {
+              animalChoosen = animal;
+              count = 1;
+            } else if (animalChoosen.energy == animal.energy) {
+              count++;
+            }
+          }
+          if (count == 1) {
+            animalChoosen.energy += this.plantEnergy;
+          } else {
+            for (Animal animal : animalsAtPosition) {
+              if (animalChoosen.energy == animal.energy) {
+                animal.energy += this.plantEnergy / count;
+              }
+            }
+          }
+          this.grassHash.remove(vector);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void animalsCopulation() {
+    Map<Vector2d, LinkedList<Animal>> animalsHash = this.getAnimalsHash();
+    animalsHash.forEach((Vector2d vector, LinkedList<Animal> animalsAtPosition) -> {
+      if (animalsAtPosition.size() > 1) {
+        int count = 0;
+        for (Animal animal : animalsAtPosition) {
+          if (animal.canCopulate())
+            count++;
+          if (count > 1)
+            break;
+        }
+        if (count > 1) {
+          Animal mother = animalsAtPosition.getFirst();
+          for (int i = 1; i < animalsAtPosition.size(); i++) {
+            Animal animal = animalsAtPosition.get(i);
+            if (mother.energy < animal.energy) {
+              mother = animal;
+            }
+          }
+          Animal father = animalsAtPosition.getFirst();
+          if (mother.equals(father))
+            father = animalsAtPosition.get(1);
+          for (int i = 1; i < animalsAtPosition.size(); i++) {
+            Animal animal = animalsAtPosition.get(i);
+            if (father.energy < animal.energy && !animal.equals(mother)) {
+              father = animal;
+            }
+          }
+          Genes genes = new Genes(mother, father);
+          int energy1 = mother.energy / 4;
+          int energy2 = father.energy / 4;
+          mother.energy -= energy1;
+          father.energy -= energy2;
+          int childEnergy = energy1 + energy2;
+          Animal animal = new Animal(this, vector, childEnergy, genes);
+//          System.out.println(mother.getPosition().toString() + " " + father.getPosition().toString() + " COPULATE ");
+//          System.out.println(animal.getPosition().toString() + " " + animal.getPosition() + " " + animal.energy + " CHILD ");
+          this.place(animal);
+        }
+      }
+    });
+  }
+
+  @Override
+  public void generateDayGrass() {
+    this.generateJungleGrass();
+    this.generateOutJungleGrass();
   }
 
   public void addAnimal(Animal animal, Vector2d newPosition) {
-//    Vector2d animalPosition = animal.getPosition();
     LinkedList<Animal> list = this.animalsHash.get(newPosition);
     if (list == null) {
-      LinkedList<Animal> tmp = new LinkedList<>();
-      tmp.add(animal);
-      this.animalsHash.put(newPosition, tmp);
+      LinkedList<Animal> animalLinkedList = new LinkedList<>();
+      animalLinkedList.add(animal);
+      this.animalsHash.put(newPosition, animalLinkedList);
     } else {
       list.add(animal);
     }
@@ -73,35 +233,61 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     }
   }
 
-  public boolean isOccupied(Vector2d position) {
-    return this.animalsHash.get(position) != null;
+  public void deleteAnimal(Animal animal) {
+    this.animalsList.remove(animal);
+    this.removeAnimal(animal);
   }
 
-  public Object objectAt(Vector2d position) {
-    LinkedList<Animal> list = this.animalsHash.get(position);
-    if (list != null) {
-      if (list.size() > 0) {
-        return list.getFirst();
-      } else { // NIE POWINNO SIE ZDARZYC
-        this.animalsHash.remove(position);
-      }
-    }
-    return null;
+  public boolean isJungle(Vector2d position) {
+    return position.precedes(this.jungleRightTop) && position.follows(this.jungleLeftBottom);
+  }
+
+  private boolean grassOnField(Vector2d position) {
+    return this.grassHash.get(position) != null;
+  }
+
+  private Grass getGrassOnField(Vector2d position) {
+    return this.grassHash.get(position);
   }
 
   public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
-//    Animal animal = this.animals.remove(oldPosition);
-//    this.animals.put(newPosition, animal);
-//    System.out.println("HERE");
     this.removeAnimal(animal);
     this.addAnimal(animal, newPosition);
     return true;
   }
 
-  public void deleteAnimal(Animal animal) {
-    this.animalsList.remove(animal);
-    this.removeAnimal(animal);
-//    Vector2d animalPosition = animal.getPosition();
-//    this.animals.remove(animalPosition);
+  public void generateJungle() {
+    int middleWidth = this.width / 2;
+    int middleHeight = this.height / 2;
+    this.jungleLeftBottom = new Vector2d(middleWidth - 1, middleHeight - 1);
+    this.jungleRightTop = new Vector2d(middleWidth + 1, middleHeight + 1);
+  }
+
+  private void generateJungleGrass() {
+    int numberOfAttemps = (this.jungleRightTop.x - this.jungleLeftBottom.x + 1) * (this.jungleRightTop.y - this.jungleLeftBottom.y + 1);
+    for (int i = 0; i < numberOfAttemps; i++) {
+      int x = (int) ((Math.random() * (this.jungleRightTop.x - this.jungleLeftBottom.x + 1)) + this.jungleLeftBottom.x);
+      int y = (int) ((Math.random() * (this.jungleRightTop.y - this.jungleLeftBottom.y + 1)) + this.jungleLeftBottom.y);
+      Vector2d vector = new Vector2d(x, y);
+      if (!this.isOccupied(vector)) {
+        Grass grass = new Grass(vector);
+        this.grassHash.put(vector, grass);
+        break;
+      }
+    }
+  }
+
+  private void generateOutJungleGrass() {
+    int numberOfAttemps = (this.rightTop.x + 1) * (this.rightTop.y + 1);
+    for (int i = 0; i < numberOfAttemps; i++) {
+      int x = (int) ((Math.random() * (this.rightTop.x + 1)));
+      int y = (int) ((Math.random() * (this.rightTop.y + 1)));
+      Vector2d vector = new Vector2d(x, y);
+      if (!this.isJungle(vector) && !this.isOccupied(vector)) {
+        Grass grass = new Grass(vector);
+        this.grassHash.put(vector, grass);
+        break;
+      }
+    }
   }
 }

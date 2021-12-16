@@ -8,9 +8,9 @@ import java.util.List;
 
 public class SimulationEngine implements IEngine, Runnable {
   private final AbstractWorldMap map;
-//  private final List<Animal> animals = new ArrayList<>();
-  protected final List<App> observers = new ArrayList<>();
-  protected int moveDelay;
+  private final List<App> observers = new ArrayList<>();
+  private int moveDelay;
+  private boolean isRunning = true;
 
   public SimulationEngine(AbstractWorldMap map, int animalsAtStart) {
     this.map = map;
@@ -46,17 +46,23 @@ public class SimulationEngine implements IEngine, Runnable {
       Genes genes = new Genes();
       Animal animal = new Animal(this.map, vector, this.map.startEnergy, genes);
       this.map.place(animal);
-//      if (this.map.place(animal))
-//        this.animals.add(animal);
     }
   }
 
   public void addObserver(App gui) {
-    observers.add(gui);
+    this.observers.add(gui);
+  }
+
+  public void removeObserver(App gui) {
+    this.observers.remove(gui);
   }
 
   public void setDayTimeChange(int time) {
     this.moveDelay = time;
+  }
+
+  public void changeState() {
+    this.isRunning = !this.isRunning;
   }
 
   @Override
@@ -64,16 +70,18 @@ public class SimulationEngine implements IEngine, Runnable {
     while (true) {
       try {
         Thread.sleep(this.moveDelay);
+        if (this.isRunning) {
+          this.map.clearDeadAnimals();
+          this.map.moveAllAnimals();
+          this.map.allAnimalsEat();
+          this.map.animalsCopulation();
+          this.map.generateDayGrass();
+          for (App gui : this.observers) {
+            gui.positionChanged(this.map);
+          }
+        }
       } catch (InterruptedException e) {
         System.out.print("Something is wrong");
-      }
-      this.map.clearDeadAnimals();
-      this.map.moveAllAnimals();
-      this.map.allAnimalsEat();
-      this.map.animalsCopulation();
-      this.map.generateDayGrass();
-      for (App GUI : this.observers) {
-        GUI.positionChanged();
       }
     }
   }
