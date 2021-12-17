@@ -72,6 +72,7 @@ public class SimulationEngine implements IEngine, Runnable {
         Thread.sleep(this.moveDelay);
         if (this.isRunning) {
           this.map.clearDeadAnimals();
+          this.map.nextDay();
           this.map.createMagicalAnimals(5);
           this.map.moveAllAnimals();
           this.map.allAnimalsEat();

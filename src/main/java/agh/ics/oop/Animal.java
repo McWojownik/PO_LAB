@@ -11,6 +11,8 @@ public class Animal implements IMapElement {
   //  private int[] genes = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 6, 6, 7, 7, 7, 7};
   private final Genes genes;
   protected int energy;
+  protected int daysAlive = 0;
+  protected int numberOfKids = 0;
 
   public Animal(AbstractWorldMap map, Vector2d initialPosition, int startEnergy, Genes genes) {
     this.map = map;
@@ -39,6 +41,10 @@ public class Animal implements IMapElement {
 
   public int[] getGenesArr() {
     return this.genes.getAnimalGenes();
+  }
+
+  public void liveAnotherDay(){
+    this.daysAlive++;
   }
 
   @Override
@@ -135,7 +141,6 @@ public class Animal implements IMapElement {
       }
     }
   }
-
 
   public String getAnimalColor() {
     int energy = this.energy;

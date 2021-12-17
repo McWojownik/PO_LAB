@@ -10,7 +10,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int plantEnergy;
   protected int jungleRatio;
   protected boolean isMagical;
-  protected int maxMagicAvailable;
+  protected int magicRemain;
   protected Vector2d leftBottom;
   protected Vector2d rightTop;
   protected Map<Vector2d, Grass> grassHash = new LinkedHashMap<>();
@@ -18,6 +18,9 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected LinkedList<Animal> animalsList = new LinkedList<>();
   protected Vector2d jungleLeftBottom;
   protected Vector2d jungleRightTop;
+  protected int day = 0;
+  protected int deadAnimalsCount = 0;
+  protected int deadAnimalsDays = 0;
 
 
   public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleRatio, boolean isMagical) {
@@ -28,9 +31,9 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     this.plantEnergy = plantEnergy;
     this.jungleRatio = jungleRatio;
     this.isMagical = isMagical;
-    this.maxMagicAvailable = 3;
+    this.magicRemain = 3;
     if (!this.isMagical)
-      this.maxMagicAvailable = 0;
+      this.magicRemain = 0;
     this.leftBottom = new Vector2d(0, 0);
     this.rightTop = new Vector2d(this.width - 1, this.height - 1);
     this.generateJungle();
@@ -52,8 +55,46 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     return this.animalsList;
   }
 
-  public int getMaxMagicAvailable() {
-    return this.maxMagicAvailable;
+  public int getMagicRemain() {
+    return this.magicRemain;
+  }
+
+  public int getDay(){
+    return this.day;
+  }
+
+  public int getNumberOfAnimals(){
+    return this.animalsList.size();
+  }
+
+  public int getNumberOfGrass(){
+    return this.grassHash.size();
+  }
+
+  public int averageEnergy(){
+    if (this.animalsList.size()==0)
+      return 0;
+    int total = 0;
+    for(Animal animal: this.animalsList){
+      total+=animal.energy;
+    }
+    return total/this.animalsList.size();
+  }
+
+  public int averageLifetime(){
+    if (this.deadAnimalsCount==0)
+      return 0;
+    return this.deadAnimalsDays/this.deadAnimalsCount;
+  }
+
+  public int averageKids(){
+    if(this.animalsList.size()==0)
+      return 0;
+    int total = 0;
+    for(Animal animal: this.animalsList){
+      total+=animal.numberOfKids;
+    }
+    return total/this.animalsList.size();
   }
 
   @Override
@@ -117,6 +158,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     for (int i = animalsList.size() - 1; i >= 0; i--) {
       Animal animal = animalsList.get(i);
       if (animal.isDead()) {
+        this.deadAnimalsDays+=animal.daysAlive;
+        this.deadAnimalsCount++;
         animal.removeObserver(this);
         this.deleteAnimal(animal);
       }
@@ -204,6 +247,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
           int energy2 = father.energy / 4;
           mother.energy -= energy1;
           father.energy -= energy2;
+          mother.numberOfKids++;
+          father.numberOfKids++;
           int childEnergy = energy1 + energy2;
           Animal child = new Animal(this, vector, childEnergy, genes);
 //          System.out.println(mother.getPosition().toString() + " " + father.getPosition().toString() + " COPULATE ");
@@ -303,7 +348,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   }
 
   public void createMagicalAnimals(int numberOfAnimals) {
-    if (this.isMagical && this.maxMagicAvailable > 0) {
+    if (this.isMagical && this.magicRemain > 0) {
       int total = this.animalsList.size();
       if (total <= numberOfAnimals) {
         for (int i = 0; i < numberOfAnimals; i++) {
@@ -317,7 +362,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
             this.place(copy);
           }
         }
-        this.maxMagicAvailable--;
+        this.magicRemain--;
       }
     }
   }
@@ -333,5 +378,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
       numberOfTries--;
     }
     return null;
+  }
+
+  public void nextDay(){
+    this.day++;
+    for (Animal animal: this.animalsList){
+      animal.liveAnotherDay();
+    }
   }
 }
