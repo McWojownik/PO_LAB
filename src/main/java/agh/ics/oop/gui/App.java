@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -26,8 +27,11 @@ public class App extends Application {
   private GridPane grid;
   private GridPane grid2;
   private final int speed = 100;
+  private final Text text = new Text();
+  private final Text text2 = new Text();
 
   public App() {
+
   }
 
   public void init() {
@@ -51,15 +55,19 @@ public class App extends Application {
     HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), plantEnergy);
     TextField jungleRatio = new TextField("20");
     HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
+    CheckBox magicBorderMap = new CheckBox("MAGIC BORDER MAP");
+    HBox magicBorderMapBox = new HBox(magicBorderMap);
+    CheckBox magicWrapMap = new CheckBox("MAGIC WRAP MAP");
+    HBox magicWrapMapBox = new HBox(magicWrapMap);
     Button startButton = new Button("START");
-    VBox settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleRatioBox, startButton);
-    Scene scene = new Scene(settings, 400, 400);
+    VBox settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleRatioBox, magicBorderMapBox, magicWrapMapBox, startButton);
+    Scene scene = new Scene(settings);
     primaryStage.setScene(scene);
     primaryStage.show();
     startButton.setOnAction((e) -> {
       this.grid.getChildren().clear();
-      this.borderMap = new BorderMap(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()), Integer.parseInt(animalsAtStart.getText()), Integer.parseInt(plantEnergy.getText()), Integer.parseInt(jungleRatio.getText()));
-      this.wrapMap = new WrapMap(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()), Integer.parseInt(animalsAtStart.getText()), Integer.parseInt(plantEnergy.getText()), Integer.parseInt(jungleRatio.getText()));
+      this.borderMap = new BorderMap(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()), Integer.parseInt(animalsAtStart.getText()), Integer.parseInt(plantEnergy.getText()), Integer.parseInt(jungleRatio.getText()), magicBorderMap.isSelected());
+      this.wrapMap = new WrapMap(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()), Integer.parseInt(startEnergy.getText()), Integer.parseInt(moveEnergy.getText()), Integer.parseInt(animalsAtStart.getText()), Integer.parseInt(plantEnergy.getText()), Integer.parseInt(jungleRatio.getText()), magicWrapMap.isSelected());
       this.mapVisualizer = new GridVisualizer(this.borderMap, this.grid);
       this.mapVisualizer2 = new GridVisualizer(this.wrapMap, this.grid2);
       Vector2d leftBottom = new Vector2d(0, 0);
@@ -79,12 +87,16 @@ public class App extends Application {
         stopStart.setOnAction((e2) -> {
           this.engine.changeState();
         });
-        VBox left = new VBox(stopStart, this.grid);
+        this.text2.setText(String.valueOf(this.borderMap.getMaxMagicAvailable()));
+        HBox magicCount = new HBox(new Text("MAGIC REMAIN: "), this.text);
+        VBox left = new VBox(stopStart, magicCount, this.grid);
         Button stopStart2 = new Button("CHANGE");
         stopStart2.setOnAction((e2) -> {
           this.engine2.changeState();
         });
-        VBox right = new VBox(stopStart2, this.grid2);
+        this.text2.setText(String.valueOf(this.wrapMap.getMaxMagicAvailable()));
+        HBox magicCount2 = new HBox(new Text("MAGIC REMAIN: "), this.text2);
+        VBox right = new VBox(stopStart2, magicCount2, this.grid2);
         HBox mainBox = new HBox(left, right);
         Scene scene2 = new Scene(mainBox);
         primaryStage.setScene(scene2);
@@ -104,11 +116,13 @@ public class App extends Application {
       try {
         if (map instanceof BorderMap) {
           this.grid.getChildren().clear();
+          this.text.setText(String.valueOf(map.getMaxMagicAvailable()));
           this.mapVisualizer.draw(this.borderMap.getLeftBottom(), this.borderMap.getRightTop());
         }
 //      else if (map instanceof WrapMap) {
         else {
           this.grid2.getChildren().clear();
+          this.text2.setText(String.valueOf(map.getMaxMagicAvailable()));
           this.mapVisualizer2.draw(this.wrapMap.getLeftBottom(), this.wrapMap.getRightTop());
         }
       } catch (FileNotFoundException e) {

@@ -9,6 +9,10 @@ public class Genes {
     this.animalGenes = this.randomGenes();
   }
 
+  public Genes(int[] copiedGenes) {
+    this.animalGenes = this.copyGenes(copiedGenes);
+  }
+
   public Genes(Animal mother, Animal father) {
     this.animalGenes = this.parentGenes(mother, father);
   }
@@ -21,6 +25,15 @@ public class Genes {
     int[] genes = new int[32];
     for (int i = 0; i < 32; i++) {
       genes[i] = (int) (Math.random() * 8);
+    }
+    Arrays.sort(genes);
+    return genes;
+  }
+
+  private int[] copyGenes(int[] copiedGenes) {
+    int[] genes = new int[32];
+    for (int i = 0; i < 32; i++) {
+      genes[i] = copiedGenes[i];
     }
     Arrays.sort(genes);
     return genes;

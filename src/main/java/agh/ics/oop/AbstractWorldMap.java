@@ -9,6 +9,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int moveEnergy;
   protected int plantEnergy;
   protected int jungleRatio;
+  protected boolean isMagical;
+  protected int maxMagicAvailable;
   protected Vector2d leftBottom;
   protected Vector2d rightTop;
   protected Map<Vector2d, Grass> grassHash = new LinkedHashMap<>();
@@ -18,13 +20,17 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected Vector2d jungleRightTop;
 
 
-  public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleRatio) {
+  public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleRatio, boolean isMagical) {
     this.width = width;
     this.height = height;
     this.startEnergy = startEnergy;
     this.moveEnergy = moveEnergy;
     this.plantEnergy = plantEnergy;
     this.jungleRatio = jungleRatio;
+    this.isMagical = isMagical;
+    this.maxMagicAvailable = 3;
+    if (!this.isMagical)
+      this.maxMagicAvailable = 0;
     this.leftBottom = new Vector2d(0, 0);
     this.rightTop = new Vector2d(this.width - 1, this.height - 1);
     this.generateJungle();
@@ -44,6 +50,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
   public LinkedList<Animal> getAnimalsList() {
     return this.animalsList;
+  }
+
+  public int getMaxMagicAvailable() {
+    return this.maxMagicAvailable;
   }
 
   @Override
@@ -116,6 +126,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   @Override
   public void moveAllAnimals() {
     LinkedList<Animal> animalsList = this.getAnimalsList();
+//    System.out.println(animalsList.size());
 //    Map<Vector2d, LinkedList<Animal>> animalsHash = super.getAnimalsHash();
 //    AtomicInteger total = new AtomicInteger();
 //    animalsHash.forEach((k, v) -> total.addAndGet(v.size()));
@@ -194,10 +205,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
           mother.energy -= energy1;
           father.energy -= energy2;
           int childEnergy = energy1 + energy2;
-          Animal animal = new Animal(this, vector, childEnergy, genes);
+          Animal child = new Animal(this, vector, childEnergy, genes);
 //          System.out.println(mother.getPosition().toString() + " " + father.getPosition().toString() + " COPULATE ");
-//          System.out.println(animal.getPosition().toString() + " " + animal.getPosition() + " " + animal.energy + " CHILD ");
-          this.place(animal);
+//          System.out.println(animal.getPosition().toString() + " " + child.getPosition() + " " + child.energy + " CHILD ");
+          this.place(child);
         }
       }
     });
@@ -289,5 +300,38 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         break;
       }
     }
+  }
+
+  public void createMagicalAnimals(int numberOfAnimals) {
+    if (this.isMagical && this.maxMagicAvailable > 0) {
+      int total = this.animalsList.size();
+      if (total <= numberOfAnimals) {
+        for (int i = 0; i < numberOfAnimals; i++) {
+          Vector2d vector = this.emptyPosition();
+          if (vector != null) {
+            int index = (int) (Math.random() * total);
+            Animal animal = this.animalsList.get(index);
+            int[] animalGenes = animal.getGenesArr();
+            Genes genes = new Genes(animalGenes);
+            Animal copy = new Animal(this, vector, this.startEnergy, genes);
+            this.place(copy);
+          }
+        }
+        this.maxMagicAvailable--;
+      }
+    }
+  }
+
+  public Vector2d emptyPosition() {
+    int numberOfTries = this.width * this.height;
+    while (numberOfTries > 0) {
+      int x = (int) (Math.random() * this.width);
+      int y = (int) (Math.random() * this.height);
+      Vector2d vector = new Vector2d(x, y);
+      if (this.animalsHash.get(vector) == null)
+        return vector;
+      numberOfTries--;
+    }
+    return null;
   }
 }
