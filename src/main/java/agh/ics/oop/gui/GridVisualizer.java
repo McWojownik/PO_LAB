@@ -12,24 +12,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 
 public class GridVisualizer {
-  private final IWorldMap map;
+  private final AbstractWorldMap map;
   private final GridPane grid;
-  private final int boxSize = 30;
+  private final int boxSize = 20;
+  private final App app;
 
-  public GridVisualizer(IWorldMap map, GridPane grid) {
+  public GridVisualizer(AbstractWorldMap map, GridPane grid, App app) {
     this.map = map;
     this.grid = grid;
+    this.app =app;
   }
 
   public void draw(Vector2d leftBottom, Vector2d rightTop) throws FileNotFoundException {
-    this.drawHeader(leftBottom, rightTop);
+//    this.drawHeader(leftBottom, rightTop);
     for (int i = rightTop.y; i >= leftBottom.y; i--) {
 //      this.grid.getRowConstraints().add(new RowConstraints(40));
-      Label label = new Label(String.valueOf(i));
-      this.grid.add(label, 0, rightTop.y - i + 1);
-      GridPane.setHalignment(label, HPos.CENTER);
+//      Label label = new Label(String.valueOf(i));
+//      this.grid.add(label, 0, rightTop.y - i + 1);
+//      GridPane.setHalignment(label, HPos.CENTER);
       for (int j = leftBottom.x; j <= rightTop.x + 1; j++) {
         if (j <= rightTop.x) {
           VBox box = new VBox();
@@ -42,9 +45,18 @@ public class GridVisualizer {
           if (obj != null) {
             Circle circle = new Circle((int) (this.boxSize/2), (int) (this.boxSize/2), (int) (this.boxSize/2));
             if (obj instanceof Animal) {
-              String color = this.map.getStrongestAnimalColorOnField(vector);
+              Animal strongest = this.map.getStrongestAnimalOnField(vector);
+//              String color = this.map.getStrongestAnimalColorOnField(vector);
+              String color = strongest.getAnimalColor();
               circle.setFill(Color.web("#" + color));
 //              circle.setStyle("-fx-background-color: #" + color + ";");
+              box.setOnMouseClicked((e)->{
+                this.app.observedGenes.setText(Arrays.toString(strongest.getGenesArr()));
+                this.app.removeStatisticsObservation();
+//                this.map.removeStatisticsObservation();
+                this.app.observedAnimal = strongest;
+                strongest.observeStatistics();
+              });
             } else {
 //              String color = this.map.getGrassColorOnField(vector);
 //              box.setStyle("-fx-background-color: #" + color + ";");
@@ -78,6 +90,12 @@ public class GridVisualizer {
       label.setPrefHeight(this.boxSize);
       this.grid.add(label, j - lowerLeft.x + 1, 0);
 //      this.grid.getColumnConstraints().add(new ColumnConstraints(40));
+      GridPane.setHalignment(label, HPos.CENTER);
+    }
+    for (int i = upperRight.y; i >= lowerLeft.y; i--) {
+//      this.grid.getRowConstraints().add(new RowConstraints(40));
+      label = new Label(String.valueOf(i));
+      this.grid.add(label, 0, upperRight.y - i + 1);
       GridPane.setHalignment(label, HPos.CENTER);
     }
   }

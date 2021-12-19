@@ -9,7 +9,7 @@ public interface IWorldMap {
 
   Object objectAt(Vector2d position);
 
-  String getStrongestAnimalColorOnField(Vector2d position);
+//  String getStrongestAnimalColorOnField(Vector2d position);
 
   String getGrassColorOnField(Vector2d position);
 

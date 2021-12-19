@@ -16,7 +16,9 @@ public class SettingsPanel {
   protected TextField moveEnergy;
   protected TextField animalsAtStart;
   protected TextField plantEnergy;
-  protected TextField jungleRatio;
+//  protected TextField jungleRatio;
+  protected TextField jungleWidth;
+  protected TextField jungleHeight;
   protected CheckBox magicBorderMap;
   protected CheckBox magicWrapMap;
 
@@ -29,18 +31,22 @@ public class SettingsPanel {
     HBox startEnergyBox = new HBox(new Text("START ENERGY: "), startEnergy);
     this.moveEnergy = new TextField("1");
     HBox moveEnergyBox = new HBox(new Text("MOVE ENERGY: "), moveEnergy);
-    this.animalsAtStart = new TextField("10");
+    this.animalsAtStart = new TextField("50");
     HBox animalsAtStartBox = new HBox(new Text("NUMBER OF ANIMALS: "), animalsAtStart);
-    this.plantEnergy = new TextField("10");
+    this.plantEnergy = new TextField("20");
     HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), plantEnergy);
-    this.jungleRatio = new TextField("20");
-    HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
+//    this.jungleRatio = new TextField("20");
+//    HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
+    this.jungleWidth = new TextField("3");
+    HBox jungleWidthBox = new HBox(new Text("JUNGLE WIDTH: "), jungleWidth);
+    this.jungleHeight = new TextField("3");
+    HBox jungleHeightBox = new HBox(new Text("JUNGLE HEIGHT: "), jungleHeight);
     this.magicBorderMap = new CheckBox("MAGIC BORDER MAP");
     HBox magicBorderMapBox = new HBox(magicBorderMap);
     this.magicWrapMap = new CheckBox("MAGIC WRAP MAP");
     HBox magicWrapMapBox = new HBox(magicWrapMap);
     this.startButton = new Button("START");
-    this.settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleRatioBox, magicBorderMapBox, magicWrapMapBox, startButton);
+    this.settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleWidthBox, jungleHeightBox, magicBorderMapBox, magicWrapMapBox, startButton);
   }
 
   public VBox getSettings() {

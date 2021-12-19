@@ -1,8 +1,8 @@
 package agh.ics.oop;
 
 public class BorderMap extends AbstractWorldMap {
-  public BorderMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleRatio, boolean isMagical) {
-    super(width, height, startEnergy, moveEnergy, animalsAtStart, plantEnergy, jungleRatio, isMagical);
+  public BorderMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
+    super(width, height, startEnergy, moveEnergy, animalsAtStart, plantEnergy, jungleWidth, jungleHeight, isMagical);
   }
 
   public boolean canMoveBeyondMap() {

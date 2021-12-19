@@ -45,6 +45,7 @@ public class SimulationEngine implements IEngine, Runnable {
     for (Vector2d vector : startingPoints) {
       Genes genes = new Genes();
       Animal animal = new Animal(this.map, vector, this.map.startEnergy, genes);
+      System.out.println(vector.toString());
       this.map.place(animal);
     }
   }

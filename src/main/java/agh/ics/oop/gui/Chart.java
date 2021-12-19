@@ -21,6 +21,8 @@ public class Chart {
     this.lineChart = new LineChart<>(xAxis, yAxis);
     this.lineChart.setAnimated(false);
     this.lineChart.setCreateSymbols(false);
+    this.lineChart.setPrefWidth(300);
+    this.lineChart.setPrefHeight(200);
     this.animalsSeries.setName("Animals living");
     this.grassSeries.setName("Grass on map");
     this.energySeries.setName("Average energy");

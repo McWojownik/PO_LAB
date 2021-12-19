@@ -4,10 +4,7 @@ import agh.ics.oop.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -31,9 +28,14 @@ public class App extends Application {
   private final Text text = new Text();
   private final Text text2 = new Text();
   private final Chart lineChart = new Chart();
+  private final Chart lineChart2 = new Chart();
+  protected Animal observedAnimal = null;
+  protected Text observedGenes = new Text("null");
+  protected Text observedNumberOfKids = new Text("null");
+  protected Text observedNumberOfDescendants = new Text("null");
+  protected Text observedDays = new Text("null");
 
   public App() {
-
   }
 
   public void init() {
@@ -52,10 +54,12 @@ public class App extends Application {
       Vector2d leftBottom = new Vector2d(0, 0);
       Vector2d rightTop = new Vector2d(Integer.parseInt(settings.width.getText()) - 1, Integer.parseInt(settings.height.getText()) - 1);
       this.grid.getChildren().clear();
-      this.borderMap = new BorderMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleRatio.getText()), settings.magicBorderMap.isSelected());
-      this.wrapMap = new WrapMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleRatio.getText()), settings.magicWrapMap.isSelected());
-      this.mapVisualizer = new GridVisualizer(this.borderMap, this.grid);
-      this.mapVisualizer2 = new GridVisualizer(this.wrapMap, this.grid2);
+//      this.borderMap = new BorderMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleRatio.getText()), settings.magicBorderMap.isSelected());
+//      this.wrapMap = new WrapMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleRatio.getText()), settings.magicWrapMap.isSelected());
+      this.borderMap = new BorderMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleWidth.getText()), Integer.parseInt(settings.jungleHeight.getText()), settings.magicBorderMap.isSelected());
+      this.wrapMap = new WrapMap(Integer.parseInt(settings.width.getText()), Integer.parseInt(settings.height.getText()), Integer.parseInt(settings.startEnergy.getText()), Integer.parseInt(settings.moveEnergy.getText()), Integer.parseInt(settings.animalsAtStart.getText()), Integer.parseInt(settings.plantEnergy.getText()), Integer.parseInt(settings.jungleWidth.getText()), Integer.parseInt(settings.jungleHeight.getText()), settings.magicWrapMap.isSelected());
+      this.mapVisualizer = new GridVisualizer(this.borderMap, this.grid, this);
+      this.mapVisualizer2 = new GridVisualizer(this.wrapMap, this.grid2, this);
       try {
         this.engine = new SimulationEngine(this.borderMap, Integer.parseInt(settings.animalsAtStart.getText()));
         this.engine.addObserver(this);
@@ -79,8 +83,16 @@ public class App extends Application {
         this.text2.setText(String.valueOf(this.wrapMap.getMagicRemain()));
         HBox magicCount2 = new HBox(new Text("MAGIC REMAIN: "), this.text2);
         VBox right = new VBox(stopStart2, magicCount2, this.grid2);
-//        Chart lineChart = new Chart();
-        HBox mainBox = new HBox(this.lineChart.getChart(), left, right);
+        HBox mapsAndCharts = new HBox(this.lineChart.getChart(), left, right, this.lineChart2.getChart());
+        mapsAndCharts.setSpacing(5);
+        HBox observedGenesBox = new HBox(new Text("Genes: "), this.observedGenes);
+        HBox observedDaysBox = new HBox(new Text("Days survived: "), this.observedDays);
+        HBox observedKidsBox = new HBox(new Text("Number of kids: "), this.observedNumberOfKids);
+        HBox observedDescendantsBox = new HBox(new Text("Number of descendants: "), this.observedNumberOfDescendants);
+        VBox specificInfo = new VBox(observedGenesBox, observedDaysBox, observedKidsBox, observedDescendantsBox);
+        specificInfo.setSpacing(5);
+        VBox mainBox = new VBox(mapsAndCharts, specificInfo);
+        mainBox.setSpacing(5);
         Scene scene2 = new Scene(mainBox);
         primaryStage.setScene(scene2);
         primaryStage.show();
@@ -100,6 +112,7 @@ public class App extends Application {
         if (map instanceof BorderMap) {
           this.grid.getChildren().clear();
           this.text.setText(String.valueOf(map.getMagicRemain()));
+          this.refreshStatistics(map);
           this.lineChart.addData(map.getDay(), map.getNumberOfAnimals(), map.getNumberOfGrass(), map.averageEnergy(), map.averageLifetime(), map.averageKids());
           this.mapVisualizer.draw(this.borderMap.getLeftBottom(), this.borderMap.getRightTop());
         }
@@ -107,11 +120,33 @@ public class App extends Application {
         else {
           this.grid2.getChildren().clear();
           this.text2.setText(String.valueOf(map.getMagicRemain()));
+          this.refreshStatistics(map);
+          this.lineChart2.addData(map.getDay(), map.getNumberOfAnimals(), map.getNumberOfGrass(), map.averageEnergy(), map.averageLifetime(), map.averageKids());
           this.mapVisualizer2.draw(this.wrapMap.getLeftBottom(), this.wrapMap.getRightTop());
         }
       } catch (FileNotFoundException e) {
         e.printStackTrace();
       }
     });
+  }
+
+  public void removeStatisticsObservation() {
+    this.borderMap.removeStatisticsObservation();
+    this.wrapMap.removeStatisticsObservation();
+  }
+
+  private void refreshStatistics(AbstractWorldMap map) {
+    if (this.observedAnimal != null && map.isObservedAnimalOnMap) {
+      this.observedNumberOfKids.setText(String.valueOf(this.observedAnimal.getNumberOfKids2()));
+      int descendants = map.countAllObservedAnimal();
+      if (descendants >= 0)
+        this.observedNumberOfDescendants.setText(String.valueOf(descendants));
+      else
+        this.observedNumberOfDescendants.setText("no descendants");
+      if (!this.observedAnimal.isDead())
+        this.observedDays.setText("still alive");
+      else
+        this.observedDays.setText(String.valueOf(this.observedAnimal.getEraDied()));
+    }
   }
 }

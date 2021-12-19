@@ -13,6 +13,9 @@ public class Animal implements IMapElement {
   protected int energy;
   protected int daysAlive = 0;
   protected int numberOfKids = 0;
+  protected int numberOfKids2 = 0;
+  protected boolean isUnderObservation = false;
+  private int eraDied = 0;
 
   public Animal(AbstractWorldMap map, Vector2d initialPosition, int startEnergy, Genes genes) {
     this.map = map;
@@ -45,6 +48,14 @@ public class Animal implements IMapElement {
 
   public void liveAnotherDay(){
     this.daysAlive++;
+  }
+
+  public int getEraDied(){
+    return this.eraDied;
+  }
+
+  public void setEraDied(int day){
+    this.eraDied = day;
   }
 
   @Override
@@ -80,6 +91,12 @@ public class Animal implements IMapElement {
 
   public void removeObserver(IPositionChangeObserver observer) {
     this.observers.remove(observer);
+  }
+
+  public void observeStatistics(){
+    this.isUnderObservation = true;
+    this.numberOfKids2 = 0;
+    this.map.isObservedAnimalOnMap=true;
   }
 
   boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
@@ -159,5 +176,9 @@ public class Animal implements IMapElement {
     if (energy < 8 * this.map.startEnergy)
       return "870000";
     return "e8138f";
+  }
+
+  public int getNumberOfKids2(){
+    return this.numberOfKids2;
   }
 }
