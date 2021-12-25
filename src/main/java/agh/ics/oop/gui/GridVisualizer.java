@@ -17,13 +17,16 @@ import java.util.Arrays;
 public class GridVisualizer {
   private final AbstractWorldMap map;
   private final GridPane grid;
-  private final int boxSize = 20;
   private final App app;
+  private final SimulationEngine engine;
+  private int boxSize = 5;
 
-  public GridVisualizer(AbstractWorldMap map, GridPane grid, App app) {
+  public GridVisualizer(AbstractWorldMap map, GridPane grid, App app, SimulationEngine engine, int boxSize) {
     this.map = map;
     this.grid = grid;
-    this.app =app;
+    this.app = app;
+    this.engine = engine;
+    this.boxSize = boxSize;
   }
 
   public void draw(Vector2d leftBottom, Vector2d rightTop) throws FileNotFoundException {
@@ -43,19 +46,27 @@ public class GridVisualizer {
           box.setStyle("-fx-background-color: #" + c + ";");
           IMapElement obj = (IMapElement) this.getObject(vector);
           if (obj != null) {
-            Circle circle = new Circle((int) (this.boxSize/2), (int) (this.boxSize/2), (int) (this.boxSize/2));
+            Circle circle = new Circle((int) (this.boxSize / 2), (int) (this.boxSize / 2), (int) (this.boxSize / 2));
             if (obj instanceof Animal) {
               Animal strongest = this.map.getStrongestAnimalOnField(vector);
 //              String color = this.map.getStrongestAnimalColorOnField(vector);
-              String color = strongest.getAnimalColor();
-              circle.setFill(Color.web("#" + color));
+              if(!this.map.getAnimalsHightlighted()){
+                String color = strongest.getAnimalColor();
+                circle.setFill(Color.web("#" + color));
+              }
+              else{
+                if(this.map.checkIfHighlightedOnField(vector))
+                  circle.setFill(Color.web("#2235e3"));
+                else{
+                  String color = strongest.getAnimalColor();
+                  circle.setFill(Color.web("#" + color));
+                }
+              }
 //              circle.setStyle("-fx-background-color: #" + color + ";");
-              box.setOnMouseClicked((e)->{
-                this.app.observedGenes.setText(Arrays.toString(strongest.getGenesArr()));
-                this.app.removeStatisticsObservation();
-//                this.map.removeStatisticsObservation();
-                this.app.observedAnimal = strongest;
-                strongest.observeStatistics();
+              box.setOnMouseClicked((e) -> {
+                if (!this.engine.getIsRunning()){
+                  this.app.changeObservedAnimal(strongest, this.map);
+                }
               });
             } else {
 //              String color = this.map.getGrassColorOnField(vector);

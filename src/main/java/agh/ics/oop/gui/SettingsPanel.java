@@ -19,34 +19,37 @@ public class SettingsPanel {
 //  protected TextField jungleRatio;
   protected TextField jungleWidth;
   protected TextField jungleHeight;
+  protected TextField speed;
   protected CheckBox magicBorderMap;
   protected CheckBox magicWrapMap;
 
   public SettingsPanel(){
     this.width = new TextField("11");
-    HBox widthBox = new HBox(new Text("WIDTH: "), width);
+    HBox widthBox = new HBox(new Text("WIDTH: "), this.width);
     this.height = new TextField("11");
-    HBox heightBox = new HBox(new Text("HEIGHT: "), height);
+    HBox heightBox = new HBox(new Text("HEIGHT: "), this.height);
     this.startEnergy = new TextField("40");
-    HBox startEnergyBox = new HBox(new Text("START ENERGY: "), startEnergy);
+    HBox startEnergyBox = new HBox(new Text("START ENERGY: "), this.startEnergy);
     this.moveEnergy = new TextField("1");
-    HBox moveEnergyBox = new HBox(new Text("MOVE ENERGY: "), moveEnergy);
+    HBox moveEnergyBox = new HBox(new Text("MOVE ENERGY: "), this.moveEnergy);
     this.animalsAtStart = new TextField("50");
-    HBox animalsAtStartBox = new HBox(new Text("NUMBER OF ANIMALS: "), animalsAtStart);
+    HBox animalsAtStartBox = new HBox(new Text("NUMBER OF ANIMALS: "), this.animalsAtStart);
     this.plantEnergy = new TextField("20");
-    HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), plantEnergy);
+    HBox plantEnergyBox = new HBox(new Text("PLANT ENERGY: "), this.plantEnergy);
 //    this.jungleRatio = new TextField("20");
 //    HBox jungleRatioBox = new HBox(new Text("JUNGLE RATIO: "), jungleRatio);
     this.jungleWidth = new TextField("3");
-    HBox jungleWidthBox = new HBox(new Text("JUNGLE WIDTH: "), jungleWidth);
+    HBox jungleWidthBox = new HBox(new Text("JUNGLE WIDTH: "), this.jungleWidth);
     this.jungleHeight = new TextField("3");
-    HBox jungleHeightBox = new HBox(new Text("JUNGLE HEIGHT: "), jungleHeight);
+    HBox jungleHeightBox = new HBox(new Text("JUNGLE HEIGHT: "), this.jungleHeight);
+    this.speed = new TextField("100");
+    HBox speedBox = new HBox(new Text("SPEED: "), this.speed);
     this.magicBorderMap = new CheckBox("MAGIC BORDER MAP");
-    HBox magicBorderMapBox = new HBox(magicBorderMap);
+    HBox magicBorderMapBox = new HBox(this.magicBorderMap);
     this.magicWrapMap = new CheckBox("MAGIC WRAP MAP");
-    HBox magicWrapMapBox = new HBox(magicWrapMap);
+    HBox magicWrapMapBox = new HBox(this.magicWrapMap);
     this.startButton = new Button("START");
-    this.settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleWidthBox, jungleHeightBox, magicBorderMapBox, magicWrapMapBox, startButton);
+    this.settings = new VBox(widthBox, heightBox, startEnergyBox, moveEnergyBox, animalsAtStartBox, plantEnergyBox, jungleWidthBox, jungleHeightBox, speedBox, magicBorderMapBox, magicWrapMapBox, startButton);
   }
 
   public VBox getSettings() {

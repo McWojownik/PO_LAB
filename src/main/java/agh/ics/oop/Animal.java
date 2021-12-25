@@ -16,6 +16,7 @@ public class Animal implements IMapElement {
   protected int numberOfKids2 = 0;
   protected boolean isUnderObservation = false;
   private int eraDied = 0;
+  private boolean highlight = false;
 
   public Animal(AbstractWorldMap map, Vector2d initialPosition, int startEnergy, Genes genes) {
     this.map = map;
@@ -58,6 +59,10 @@ public class Animal implements IMapElement {
     this.eraDied = day;
   }
 
+  public boolean getHighlight(){ return this.highlight;}
+
+  public void setHighlight(boolean change){ this.highlight=change;}
+
   @Override
   public String toString() {
     return this.orientation.toString();
@@ -97,6 +102,10 @@ public class Animal implements IMapElement {
     this.isUnderObservation = true;
     this.numberOfKids2 = 0;
     this.map.isObservedAnimalOnMap=true;
+  }
+
+  public boolean checkIfIdenticalGenes(Animal animal){
+    return this.genes.checkIfIdenticalGenes(animal.getGenesArr());
   }
 
   boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
@@ -160,6 +169,8 @@ public class Animal implements IMapElement {
   }
 
   public String getAnimalColor() {
+//    if(this.highlight)
+//      return "2235e3";
     int energy = this.energy;
     if (energy < 0.4 * this.map.startEnergy)
       return "e6cd17";

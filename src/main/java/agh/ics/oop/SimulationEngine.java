@@ -11,6 +11,7 @@ public class SimulationEngine implements IEngine, Runnable {
   private final List<App> observers = new ArrayList<>();
   private int moveDelay;
   private boolean isRunning = true;
+  private boolean isValid = true;
 
   public SimulationEngine(AbstractWorldMap map, int animalsAtStart) {
     this.map = map;
@@ -45,7 +46,6 @@ public class SimulationEngine implements IEngine, Runnable {
     for (Vector2d vector : startingPoints) {
       Genes genes = new Genes();
       Animal animal = new Animal(this.map, vector, this.map.startEnergy, genes);
-      System.out.println(vector.toString());
       this.map.place(animal);
     }
   }
@@ -66,9 +66,13 @@ public class SimulationEngine implements IEngine, Runnable {
     this.isRunning = !this.isRunning;
   }
 
+  public boolean getIsRunning(){
+    return this.isRunning;
+  }
+
   @Override
   public void run() {
-    while (true) {
+    while (this.isValid) {
       try {
         Thread.sleep(this.moveDelay);
         if (this.isRunning) {

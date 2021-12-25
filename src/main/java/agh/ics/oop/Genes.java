@@ -73,4 +73,13 @@ public class Genes {
     Arrays.sort(genes);
     return genes;
   }
+
+  public boolean checkIfIdenticalGenes(int[] genes){
+    for (int i = 0; i < 32; i++) {
+      if(this.animalGenes[i]!=genes[i]){
+        return false;
+      }
+    }
+    return true;
+  }
 }

@@ -23,8 +23,8 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int day = 0;
   protected int deadAnimalsCount = 0;
   protected int deadAnimalsDays = 0;
+  protected boolean animalsHighlighted = false;
   public boolean isObservedAnimalOnMap = false;
-
 
   public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
     this.width = width;
@@ -74,6 +74,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
   public int getNumberOfGrass() {
     return this.grassHash.size();
+  }
+
+  public boolean getAnimalsHightlighted() {
+    return this.animalsHighlighted;
   }
 
   public int averageEnergy() {
@@ -128,7 +132,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
       if (list.size() > 0) {
         return list.getFirst();
       } else { // SHOULD NOT HAPPEN
-//        this.animalsHash.remove(position);
+        this.animalsHash.remove(position);
         throw new IllegalArgumentException("Position " + position.toString() + " shouldn't be in hashMap");
       }
     }
@@ -138,6 +142,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   public Animal getStrongestAnimalOnField(Vector2d position) {
     LinkedList<Animal> animalsAtPosition = this.animalsHash.get(position);
     if (animalsAtPosition != null) {
+      // TUTAJ SPRAWDZAC CZY JEST FAKTYCZNIE JAKIES ZWIERZE W SRODKU
       Animal animal = animalsAtPosition.getFirst();
       for (int i = 1; i < animalsAtPosition.size(); i++) {
         Animal possiblyStronger = animalsAtPosition.get(i);
@@ -376,7 +381,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   public void createMagicalAnimals(int numberOfAnimals) {
     if (this.isMagical && this.magicRemain > 0) {
       int total = this.animalsList.size();
-      if (total <= numberOfAnimals) {
+      if (total > 0 && total <= numberOfAnimals) {
         for (int i = 0; i < numberOfAnimals; i++) {
           Vector2d vector = this.emptyPosition();
           if (vector != null) {
@@ -430,5 +435,65 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         count++;
     }
     return count - 1;
+  }
+
+  public Animal dominantGenotype() {
+    LinkedList<Animal> animalsList = this.getAnimalsList();
+    if (animalsList.size() == 0)
+      return null;
+    Animal animal = animalsList.getFirst();
+    int best = -1;
+    for (Animal animal1 : animalsList) {
+      int count = 0;
+      for (Animal animal2 : animalsList) {
+        if (animal1.checkIfIdenticalGenes(animal2)) {
+          count++;
+        }
+      }
+      if (count > best) {
+        best = count;
+        animal = animal1;
+      }
+    }
+    return animal;
+  }
+
+  public void highlightDominant() {
+    this.animalsHighlighted = true;
+    int[] genes = this.dominantGenotype().getGenesArr();
+    if (genes != null) {
+      LinkedList<Animal> animalsList = this.getAnimalsList();
+      for (Animal animal : animalsList) {
+        int[] animalGens = animal.getGenesArr();
+        boolean highlight = true;
+        for (int i = 0; i < 32; i++) {
+          if (genes[i] != animalGens[i]) {
+            highlight = false;
+            break;
+          }
+        }
+        if (highlight) {
+          animal.setHighlight(true);
+        }
+      }
+    }
+  }
+
+  public void removeHighlightDominant() {
+    this.animalsHighlighted = false;
+    LinkedList<Animal> animalsList = this.getAnimalsList();
+    for (Animal animal : animalsList) {
+      animal.setHighlight(false);
+    }
+  }
+
+  public boolean checkIfHighlightedOnField(Vector2d position) {
+    Map<Vector2d, LinkedList<Animal>> animalsHash = this.getAnimalsHash();
+    LinkedList<Animal> animals = animalsHash.get(position);
+    for (Animal animal : animals) {
+      if (animal.getHighlight())
+        return true;
+    }
+    return false;
   }
 }

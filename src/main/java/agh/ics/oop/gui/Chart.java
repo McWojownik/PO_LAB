@@ -6,11 +6,11 @@ import javafx.scene.chart.XYChart;
 
 public class Chart {
   private final LineChart<Number, Number> lineChart;
-  private final XYChart.Series<Number, Number> animalsSeries= new XYChart.Series<>();
-  private final XYChart.Series<Number, Number> grassSeries= new XYChart.Series<>();
-  private final XYChart.Series<Number, Number> energySeries= new XYChart.Series<>();
-  private final XYChart.Series<Number, Number> lifetimeSeries= new XYChart.Series<>();
-  private final XYChart.Series<Number, Number> childrenSeries= new XYChart.Series<>();
+  private final XYChart.Series<Number, Number> animalsSeries = new XYChart.Series<>();
+  private final XYChart.Series<Number, Number> grassSeries = new XYChart.Series<>();
+  private final XYChart.Series<Number, Number> energySeries = new XYChart.Series<>();
+  private final XYChart.Series<Number, Number> lifetimeSeries = new XYChart.Series<>();
+  private final XYChart.Series<Number, Number> childrenSeries = new XYChart.Series<>();
 
 
   public Chart() {
@@ -44,5 +44,9 @@ public class Chart {
     this.lifetimeSeries.getData().add(new XYChart.Data<>(day, averageLifetime));
     this.childrenSeries.getData().add(new XYChart.Data<>(day, averageChildren));
     this.lineChart.getData().addAll(this.animalsSeries, this.grassSeries, this.energySeries, this.lifetimeSeries, this.childrenSeries);
+  }
+
+  public XYChart.Series[] getSeries() {
+    return new XYChart.Series[]{this.animalsSeries, this.grassSeries, this.energySeries, this.lifetimeSeries, this.childrenSeries};
   }
 }
