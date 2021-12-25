@@ -24,9 +24,9 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int deadAnimalsCount = 0;
   protected int deadAnimalsDays = 0;
   protected boolean animalsHighlighted = false;
-  public boolean isObservedAnimalOnMap = false;
+  protected boolean isObservedAnimalOnMap = false;
 
-  public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
+  public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
     this.width = width;
     this.height = height;
     this.startEnergy = startEnergy;
@@ -78,6 +78,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
   public boolean getAnimalsHightlighted() {
     return this.animalsHighlighted;
+  }
+
+  public boolean getIsObservedAnimalOnMap() {
+    return this.isObservedAnimalOnMap;
   }
 
   public int averageEnergy() {

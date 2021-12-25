@@ -56,6 +56,8 @@ public class SimulationEngine implements IEngine, Runnable {
 
   public void removeObserver(App gui) {
     this.observers.remove(gui);
+    if(this.observers.size()==0)
+      this.isValid=false;
   }
 
   public void setDayTimeChange(int time) {
@@ -66,7 +68,7 @@ public class SimulationEngine implements IEngine, Runnable {
     this.isRunning = !this.isRunning;
   }
 
-  public boolean getIsRunning(){
+  public boolean getIsRunning() {
     return this.isRunning;
   }
 

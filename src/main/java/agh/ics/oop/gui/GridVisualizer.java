@@ -20,22 +20,20 @@ public class GridVisualizer {
   private final App app;
   private final SimulationEngine engine;
   private int boxSize = 5;
+  private final GuiElementBox guiElementBox; // GRASS
 
-  public GridVisualizer(AbstractWorldMap map, GridPane grid, App app, SimulationEngine engine, int boxSize) {
+  public GridVisualizer(AbstractWorldMap map, GridPane grid, App app, SimulationEngine engine, int boxSize) throws FileNotFoundException {
     this.map = map;
     this.grid = grid;
     this.app = app;
     this.engine = engine;
     this.boxSize = boxSize;
+    this.guiElementBox = new GuiElementBox("grass.png", boxSize);
   }
 
   public void draw(Vector2d leftBottom, Vector2d rightTop) throws FileNotFoundException {
 //    this.drawHeader(leftBottom, rightTop);
     for (int i = rightTop.y; i >= leftBottom.y; i--) {
-//      this.grid.getRowConstraints().add(new RowConstraints(40));
-//      Label label = new Label(String.valueOf(i));
-//      this.grid.add(label, 0, rightTop.y - i + 1);
-//      GridPane.setHalignment(label, HPos.CENTER);
       for (int j = leftBottom.x; j <= rightTop.x + 1; j++) {
         if (j <= rightTop.x) {
           VBox box = new VBox();
@@ -46,41 +44,33 @@ public class GridVisualizer {
           box.setStyle("-fx-background-color: #" + c + ";");
           IMapElement obj = (IMapElement) this.getObject(vector);
           if (obj != null) {
-            Circle circle = new Circle((int) (this.boxSize / 2), (int) (this.boxSize / 2), (int) (this.boxSize / 2));
+//            IF YOU WANT TO CHANGE GRASS IMG JUST TO COLOR OR VICE VERSA CHANGE COMMENT STYLE IN THESE LINES: 48, 50, 67, 69, 70, 72
+//            Circle circle = new Circle((int) (this.boxSize / 2), (int) (this.boxSize / 2), (int) (this.boxSize / 2));
             if (obj instanceof Animal) {
+              Circle circle = new Circle((int) (this.boxSize / 2), (int) (this.boxSize / 2), (int) (this.boxSize / 2));
               Animal strongest = this.map.getStrongestAnimalOnField(vector);
-//              String color = this.map.getStrongestAnimalColorOnField(vector);
-              if(!this.map.getAnimalsHightlighted()){
+              String strColor = "#2235e3";
+              if (!this.map.getAnimalsHightlighted()) {
                 String color = strongest.getAnimalColor();
-                circle.setFill(Color.web("#" + color));
-              }
-              else{
-                if(this.map.checkIfHighlightedOnField(vector))
-                  circle.setFill(Color.web("#2235e3"));
-                else{
+                strColor = "#"+color;
+              } else {
+                if (!this.map.checkIfHighlightedOnField(vector)) {
                   String color = strongest.getAnimalColor();
-                  circle.setFill(Color.web("#" + color));
+                  strColor = "#"+color;
                 }
               }
-//              circle.setStyle("-fx-background-color: #" + color + ";");
+              circle.setFill(Color.web(strColor));
               box.setOnMouseClicked((e) -> {
-                if (!this.engine.getIsRunning()){
+                if (!this.engine.getIsRunning())
                   this.app.changeObservedAnimal(strongest, this.map);
-                }
               });
+              box.getChildren().add(circle);
             } else {
-//              String color = this.map.getGrassColorOnField(vector);
-//              box.setStyle("-fx-background-color: #" + color + ";");
-//              GuiElementBox el = new GuiElementBox(obj.getImageSource());
-//              box.getChildren().add(el.getImage());
-              circle.setFill(Color.web("#6dad51"));
-//              circle.setStyle("-fx-background-color: #6dad51;");
+              box.getChildren().add(this.guiElementBox.getImage());
+//              circle.setFill(Color.web("#6dad51"));
             }
-//            GuiElementBox el = new GuiElementBox(obj.getImageSource());
-//            box.getChildren().add(el.getImage());
-            box.getChildren().add(circle);
+//            box.getChildren().add(circle);
           }
-//          box.setAlignment(Pos.CENTER);
           this.grid.add(box, j - leftBottom.x + 1, rightTop.y - i + 1);
         }
       }
@@ -89,8 +79,6 @@ public class GridVisualizer {
 
   private void drawHeader(Vector2d lowerLeft, Vector2d upperRight) {
     Label label = new Label(" y\\x ");
-//    this.grid.getRowConstraints().add(new RowConstraints(40));
-//    this.grid.getColumnConstraints().add(new ColumnConstraints(40));
     label.setPrefWidth(40);
     label.setPrefHeight(40);
     this.grid.add(label, 0, 0);
@@ -100,11 +88,9 @@ public class GridVisualizer {
       label.setPrefWidth(this.boxSize);
       label.setPrefHeight(this.boxSize);
       this.grid.add(label, j - lowerLeft.x + 1, 0);
-//      this.grid.getColumnConstraints().add(new ColumnConstraints(40));
       GridPane.setHalignment(label, HPos.CENTER);
     }
     for (int i = upperRight.y; i >= lowerLeft.y; i--) {
-//      this.grid.getRowConstraints().add(new RowConstraints(40));
       label = new Label(String.valueOf(i));
       this.grid.add(label, 0, upperRight.y - i + 1);
       GridPane.setHalignment(label, HPos.CENTER);

@@ -1,8 +1,8 @@
 package agh.ics.oop;
 
 public class WrapMap extends AbstractWorldMap {
-  public WrapMap(int width, int height, int startEnergy, int moveEnergy, int animalsAtStart, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
-    super(width, height, startEnergy, moveEnergy, animalsAtStart, plantEnergy, jungleWidth, jungleHeight, isMagical);
+  public WrapMap(int width, int height, int startEnergy, int moveEnergy, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
+    super(width, height, startEnergy, moveEnergy, plantEnergy, jungleWidth, jungleHeight, isMagical);
   }
 
   public boolean canMoveBeyondMap() {
