@@ -5,10 +5,12 @@ public class WrapMap extends AbstractWorldMap {
     super(width, height, startEnergy, moveEnergy, plantEnergy, jungleWidth, jungleHeight, isMagical);
   }
 
+  @Override
   public boolean canMoveBeyondMap() {
     return true;
   }
 
+  @Override
   public Vector2d moveBeyondMapVector(Vector2d oldPosition) {
     int x = 0;
     int y = 0;

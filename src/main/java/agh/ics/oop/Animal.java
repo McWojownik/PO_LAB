@@ -12,8 +12,8 @@ public class Animal implements IMapElement {
   private final Genes genes;
   protected int energy;
   protected int daysAlive = 0;
-  protected int numberOfKids = 0;
-  protected int numberOfKids2 = 0;
+  protected int numberOfKidsTotal = 0;
+  protected int numberOfKidsObserved = 0;
   protected boolean isUnderObservation = false;
   private int eraDied = 0;
   private boolean highlight = false;
@@ -27,8 +27,14 @@ public class Animal implements IMapElement {
     this.addObserver(map);
   }
 
-  protected MapDirection getOrientation() {
-    return this.orientation;
+  @Override
+  public String toString() {
+    return this.orientation.toString();
+  }
+
+  @Override
+  public Vector2d getPosition() {
+    return this.position;
   }
 
   public MoveDirection getNextAnimalMove() {
@@ -47,48 +53,25 @@ public class Animal implements IMapElement {
     return this.genes.getAnimalGenes();
   }
 
-  public void liveAnotherDay(){
+  public void liveAnotherDay() {
     this.daysAlive++;
   }
 
-  public int getEraDied(){
+  public int getEraDied() {
     return this.eraDied;
   }
 
-  public void setEraDied(int day){
+  public void setEraDied(int day) {
     this.eraDied = day;
   }
 
-  public boolean getHighlight(){ return this.highlight;}
-
-  public void setHighlight(boolean change){ this.highlight=change;}
-
-  @Override
-  public String toString() {
-    return this.orientation.toString();
+  public boolean getHighlight() {
+    return this.highlight;
   }
 
-  @Override
-  public Vector2d getPosition() {
-    return this.position;
+  public void setHighlight(boolean change) {
+    this.highlight = change;
   }
-
-//  @Override
-//  public boolean isAt(Vector2d position) {
-//    return this.position.equals(position);
-//  }
-//
-//  @Override
-//  public String getImageSource() {
-//    return "up.png";
-////    return switch (this.toString()) {
-////      case "N" -> "up.png";
-////      case "E" -> "right.png";
-////      case "S" -> "down.png";
-////      case "W" -> "left.png";
-////      default -> "";
-////    };
-//  }
 
   public void addObserver(IPositionChangeObserver observer) {
     this.observers.add(observer);
@@ -98,13 +81,13 @@ public class Animal implements IMapElement {
     this.observers.remove(observer);
   }
 
-  public void observeStatistics(){
+  public void observeStatistics() {
     this.isUnderObservation = true;
-    this.numberOfKids2 = 0;
-    this.map.isObservedAnimalOnMap=true;
+    this.numberOfKidsObserved = 0;
+    this.map.isObservedAnimalOnMap = true;
   }
 
-  public boolean checkIfIdenticalGenes(Animal animal){
+  public boolean checkIfIdenticalGenes(Animal animal) {
     return this.genes.checkIfIdenticalGenes(animal.getGenesArr());
   }
 
@@ -157,8 +140,7 @@ public class Animal implements IMapElement {
     if (this.map.canMoveTo(position)) {
       if (this.positionChanged(this.position, position))
         this.position = position;
-    }
-    else{
+    } else {
       if (this.map.canMoveBeyondMap()) {
         Vector2d vector = this.map.moveBeyondMapVector(position);
         position = this.position.add(vector);
@@ -169,8 +151,6 @@ public class Animal implements IMapElement {
   }
 
   public String getAnimalColor() {
-//    if(this.highlight)
-//      return "2235e3";
     int energy = this.energy;
     if (energy < 0.4 * this.map.startEnergy)
       return "e6cd17";
@@ -189,7 +169,7 @@ public class Animal implements IMapElement {
     return "e8138f";
   }
 
-  public int getNumberOfKids2(){
-    return this.numberOfKids2;
+  public int getNumberOfKidsObserved() {
+    return this.numberOfKidsObserved;
   }
 }

@@ -8,5 +8,5 @@ public enum MoveDirection {
   BACKWARD_LEFT,
   BACKWARD_RIGHT,
   RIGHT,
-  LEFT,
+  LEFT
 }

@@ -8,11 +8,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int startEnergy;
   protected int moveEnergy;
   protected int plantEnergy;
-  //  protected int jungleRatio;
   protected int jungleWidth;
   protected int jungleHeight;
   protected boolean isMagical;
-  protected int magicRemain;
+  protected int magicRemain = 0;
   protected Vector2d leftBottom;
   protected Vector2d rightTop;
   protected Map<Vector2d, Grass> grassHash = new LinkedHashMap<>();
@@ -32,13 +31,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     this.startEnergy = startEnergy;
     this.moveEnergy = moveEnergy;
     this.plantEnergy = plantEnergy;
-//    this.jungleRatio = jungleRatio;
     this.jungleWidth = jungleWidth;
     this.jungleHeight = jungleHeight;
     this.isMagical = isMagical;
-    this.magicRemain = 3;
-    if (!this.isMagical)
-      this.magicRemain = 0;
+    if (isMagical) this.magicRemain = 3;
     this.leftBottom = new Vector2d(0, 0);
     this.rightTop = new Vector2d(this.width - 1, this.height - 1);
     this.generateJungle();
@@ -85,8 +81,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   }
 
   public int averageEnergy() {
-    if (this.animalsList.size() == 0)
-      return 0;
+    if (this.animalsList.size() == 0) return 0;
     int total = 0;
     for (Animal animal : this.animalsList) {
       total += animal.energy;
@@ -95,17 +90,15 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   }
 
   public int averageLifetime() {
-    if (this.deadAnimalsCount == 0)
-      return 0;
+    if (this.deadAnimalsCount == 0) return 0;
     return this.deadAnimalsDays / this.deadAnimalsCount;
   }
 
   public int averageKids() {
-    if (this.animalsList.size() == 0)
-      return 0;
+    if (this.animalsList.size() == 0) return 0;
     int total = 0;
     for (Animal animal : this.animalsList) {
-      total += animal.numberOfKids;
+      total += animal.numberOfKidsTotal;
     }
     return total / this.animalsList.size();
   }
@@ -124,8 +117,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
   @Override
   public boolean isOccupied(Vector2d position) {
-    if (this.animalsHash.get(position) != null)
-      return true;
+    if (this.animalsHash.get(position) != null) return true;
     return this.grassOnField(position);
   }
 
@@ -146,30 +138,24 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   public Animal getStrongestAnimalOnField(Vector2d position) {
     LinkedList<Animal> animalsAtPosition = this.animalsHash.get(position);
     if (animalsAtPosition != null) {
-      // TUTAJ SPRAWDZAC CZY JEST FAKTYCZNIE JAKIES ZWIERZE W SRODKU
-      Animal animal = animalsAtPosition.getFirst();
-      for (int i = 1; i < animalsAtPosition.size(); i++) {
-        Animal possiblyStronger = animalsAtPosition.get(i);
-        if (animal.energy < possiblyStronger.energy)
-          animal = possiblyStronger;
+      if (animalsAtPosition.size() > 0) {
+        Animal animal = animalsAtPosition.getFirst();
+        for (int i = 1; i < animalsAtPosition.size(); i++) {
+          Animal possiblyStronger = animalsAtPosition.get(i);
+          if (animal.energy < possiblyStronger.energy) animal = possiblyStronger;
+        }
+        return animal;
+      } else { // SHOULD NOT HAPPEN
+        this.animalsHash.remove(position);
+        throw new IllegalArgumentException("Position " + position.toString() + " shouldn't be in hashMap");
       }
-      return animal;
     }
     return null;
   }
 
-//  @Override
-//  public String getStrongestAnimalColorOnField(Vector2d position) {
-//    Animal animal = this.getStrongestAnimalOnField(position);
-//    if (animal != null)
-//      return animal.getAnimalColor();
-//    throw new IllegalArgumentException("At " + position.toString() + " no animals");
-//  }
-
   @Override
   public String getGrassColorOnField(Vector2d position) {
-    if (this.isJungle(position))
-      return "004500";
+    if (this.isJungle(position)) return "004500";
     return "f7f774";
   }
 
@@ -216,17 +202,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
             if (animalChoosen.energy < animal.energy) {
               animalChoosen = animal;
               count = 1;
-            } else if (animalChoosen.energy == animal.energy) {
-              count++;
-            }
+            } else if (animalChoosen.energy == animal.energy) count++;
           }
-          if (count == 1) {
-            animalChoosen.energy += this.plantEnergy;
-          } else {
+          if (count == 1) animalChoosen.energy += this.plantEnergy;
+          else {
             for (Animal animal : animalsAtPosition) {
-              if (animalChoosen.energy == animal.energy) {
-                animal.energy += this.plantEnergy / count;
-              }
+              if (animalChoosen.energy == animal.energy) animal.energy += this.plantEnergy / count;
             }
           }
           this.grassHash.remove(vector);
@@ -242,43 +223,34 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
       if (animalsAtPosition.size() > 1) {
         int count = 0;
         for (Animal animal : animalsAtPosition) {
-          if (animal.canCopulate())
-            count++;
-          if (count > 1)
-            break;
+          if (animal.canCopulate()) count++;
+          if (count > 1) break;
         }
         if (count > 1) {
           Animal mother = animalsAtPosition.getFirst();
           for (int i = 1; i < animalsAtPosition.size(); i++) {
             Animal animal = animalsAtPosition.get(i);
-            if (mother.energy < animal.energy) {
-              mother = animal;
-            }
+            if (mother.energy < animal.energy) mother = animal;
           }
           Animal father = animalsAtPosition.getFirst();
-          if (mother.equals(father))
-            father = animalsAtPosition.get(1);
+          if (mother.equals(father)) father = animalsAtPosition.get(1);
           for (int i = 1; i < animalsAtPosition.size(); i++) {
             Animal animal = animalsAtPosition.get(i);
-            if (father.energy < animal.energy && !animal.equals(mother)) {
-              father = animal;
-            }
+            if (father.energy < animal.energy && !animal.equals(mother)) father = animal;
           }
           Genes genes = new Genes(mother, father);
-          int energy1 = mother.energy / 4;
-          int energy2 = father.energy / 4;
-          mother.energy -= energy1;
-          father.energy -= energy2;
-          mother.numberOfKids++;
-          father.numberOfKids++;
-          int childEnergy = energy1 + energy2;
+          int motherEnergy = mother.energy / 4;
+          int fatherEnergy = father.energy / 4;
+          mother.energy -= motherEnergy;
+          father.energy -= fatherEnergy;
+          mother.numberOfKidsTotal++;
+          father.numberOfKidsTotal++;
+          int childEnergy = motherEnergy + fatherEnergy;
           Animal child = new Animal(this, vector, childEnergy, genes);
           if (mother.isUnderObservation || father.isUnderObservation) {
             child.isUnderObservation = true;
-            if (mother.isUnderObservation)
-              mother.numberOfKids2++;
-            if (father.isUnderObservation)
-              father.numberOfKids2++;
+            if (mother.isUnderObservation) mother.numberOfKidsObserved++;
+            if (father.isUnderObservation) father.numberOfKidsObserved++;
           }
 //          System.out.println(mother.getPosition().toString() + " " + father.getPosition().toString() + " COPULATE ");
 //          System.out.println(animal.getPosition().toString() + " " + child.getPosition() + " " + child.energy + " CHILD ");
@@ -300,27 +272,23 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
       LinkedList<Animal> animalLinkedList = new LinkedList<>();
       animalLinkedList.add(animal);
       this.animalsHash.put(newPosition, animalLinkedList);
-    } else {
-      list.add(animal);
-    }
+    } else list.add(animal);
   }
 
-  public void removeAnimal(Animal animal) {
+  public void removeAnimalFromHashMap(Animal animal) {
     Vector2d animalPosition = animal.getPosition();
     LinkedList<Animal> list = this.animalsHash.get(animalPosition);
     if (list != null) {
       if (list.size() > 0) {
         list.remove(animal);
-        if (list.size() == 0) {
-          this.animalsHash.remove(animalPosition);
-        }
-      }
+        if (list.size() == 0) this.animalsHash.remove(animalPosition);
+      } else this.animalsHash.remove(animalPosition);
     }
   }
 
   public void deleteAnimal(Animal animal) {
     this.animalsList.remove(animal);
-    this.removeAnimal(animal);
+    this.removeAnimalFromHashMap(animal);
   }
 
   public boolean isJungle(Vector2d position) {
@@ -335,13 +303,12 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     return this.grassHash.get(position);
   }
 
-  public boolean positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
-    this.removeAnimal(animal);
+  public void positionChanged(Vector2d oldPosition, Vector2d newPosition, Animal animal) {
+    this.removeAnimalFromHashMap(animal);
     this.addAnimal(animal, newPosition);
-    return true;
   }
 
-  public void generateJungle() {
+  private void generateJungle() {
     int middleWidth = this.width / 2;
     int middleHeight = this.height / 2;
     int middleJungleWidth = this.jungleWidth / 2;
@@ -385,16 +352,27 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   public void createMagicalAnimals(int numberOfAnimals) {
     if (this.isMagical && this.magicRemain > 0) {
       int total = this.animalsList.size();
-      if (total > 0 && total <= numberOfAnimals) {
-        for (int i = 0; i < numberOfAnimals; i++) {
-          Vector2d vector = this.emptyPosition();
-          if (vector != null) {
-            int index = (int) (Math.random() * total);
-            Animal animal = this.animalsList.get(index);
-            int[] animalGenes = animal.getGenesArr();
-            Genes genes = new Genes(animalGenes);
-            Animal copy = new Animal(this, vector, this.startEnergy, genes);
-            this.place(copy);
+      if (total <= numberOfAnimals) {
+        if (total > 0) {
+          for (int i = 0; i < numberOfAnimals; i++) {
+            Vector2d vector = this.emptyPosition();
+            if (vector != null) {
+              int index = (int) (Math.random() * total);
+              Animal animal = this.animalsList.get(index);
+              int[] animalGenes = animal.getGenesArr();
+              Genes genes = new Genes(animalGenes);
+              Animal copy = new Animal(this, vector, this.startEnergy, genes);
+              this.place(copy);
+            }
+          }
+        } else {
+          for (int i = 0; i < numberOfAnimals; i++) {
+            Vector2d vector = this.emptyPosition();
+            if (vector != null) {
+              Genes genes = new Genes();
+              Animal animal = new Animal(this, vector, this.startEnergy, genes);
+              this.place(animal);
+            }
           }
         }
         this.magicRemain--;
@@ -408,8 +386,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
       int x = (int) (Math.random() * this.width);
       int y = (int) (Math.random() * this.height);
       Vector2d vector = new Vector2d(x, y);
-      if (this.animalsHash.get(vector) == null)
-        return vector;
+      if (this.animalsHash.get(vector) == null) return vector;
       numberOfTries--;
     }
     return null;
@@ -427,7 +404,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     LinkedList<Animal> animalsList = this.getAnimalsList();
     for (Animal animal : animalsList) {
       animal.isUnderObservation = false;
-      animal.numberOfKids2 = 0;
+      animal.numberOfKidsObserved = 0;
     }
   }
 
@@ -435,31 +412,32 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     LinkedList<Animal> animalsList = this.getAnimalsList();
     int count = 0;
     for (Animal animal : animalsList) {
-      if (animal.isUnderObservation)
-        count++;
+      if (animal.isUnderObservation) count++;
     }
     return count - 1;
   }
 
   public Animal dominantGenotype() {
     LinkedList<Animal> animalsList = this.getAnimalsList();
-    if (animalsList.size() == 0)
-      return null;
-    Animal animal = animalsList.getFirst();
-    int best = -1;
-    for (Animal animal1 : animalsList) {
-      int count = 0;
-      for (Animal animal2 : animalsList) {
-        if (animal1.checkIfIdenticalGenes(animal2)) {
-          count++;
+    if (animalsList.size() == 0) return null;
+    try{
+      Animal animal = animalsList.getFirst();
+      int best = -1;
+      for (Animal animalToCompare : animalsList) {
+        int count = 0;
+        for (Animal nextAnimal : animalsList) {
+          if (animalToCompare.checkIfIdenticalGenes(nextAnimal)) count++;
+        }
+        if (count > best) {
+          best = count;
+          animal = animalToCompare;
         }
       }
-      if (count > best) {
-        best = count;
-        animal = animal1;
-      }
+      return animal;
     }
-    return animal;
+    catch (ConcurrentModificationException ex){
+      throw new ConcurrentModificationException("Something wrong while searching for dominant genotype");
+    }
   }
 
   public void highlightDominant() {
@@ -476,9 +454,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
             break;
           }
         }
-        if (highlight) {
-          animal.setHighlight(true);
-        }
+        if (highlight) animal.setHighlight(true);
       }
     }
   }
@@ -495,8 +471,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     Map<Vector2d, LinkedList<Animal>> animalsHash = this.getAnimalsHash();
     LinkedList<Animal> animals = animalsHash.get(position);
     for (Animal animal : animals) {
-      if (animal.getHighlight())
-        return true;
+      if (animal.getHighlight()) return true;
     }
     return false;
   }

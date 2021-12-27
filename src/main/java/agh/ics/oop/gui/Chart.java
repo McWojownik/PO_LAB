@@ -21,8 +21,9 @@ public class Chart {
     this.lineChart = new LineChart<>(xAxis, yAxis);
     this.lineChart.setAnimated(false);
     this.lineChart.setCreateSymbols(false);
-    this.lineChart.setPrefWidth(300);
-    this.lineChart.setPrefHeight(200);
+    this.lineChart.setPrefWidth(400);
+    this.lineChart.setPrefHeight(250);
+    this.lineChart.setMinSize(300, 200);
     this.animalsSeries.setName("Animals living");
     this.grassSeries.setName("Grass on map");
     this.energySeries.setName("Average energy");
@@ -35,8 +36,6 @@ public class Chart {
   }
 
   public void addData(int day, int animalLiving, int grassOnMap, int averageEnergy, int averageLifetime, int averageChildren) {
-    // ZASTANOWIC SIE CZY NIE OBLICZAC WARTOSCI W ODPOWIEDNICH MOMENTACH, BO NP SREDNIA LICZBA DZIECI ZYJACYCH ZWIERZAT JEST OBLICZANA
-    // JEST PO CALYM DNIU CZYLI GDY JUZ JAKIES ZWIERZETA SA MARTWE
     this.lineChart.getData().clear();
     this.animalsSeries.getData().add(new XYChart.Data<>(day, animalLiving));
     this.grassSeries.getData().add(new XYChart.Data<>(day, grassOnMap));

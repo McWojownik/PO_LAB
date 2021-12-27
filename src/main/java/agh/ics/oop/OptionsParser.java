@@ -29,4 +29,8 @@ public class OptionsParser {
       default -> throw new IllegalArgumentException(direction + " is not legal map direction");
     };
   }
+
+  public int getInt(String toParse) {
+    return Integer.parseInt(toParse);
+  }
 }

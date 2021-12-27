@@ -23,18 +23,18 @@ public class Genes {
 
   private int[] randomGenes() {
     int[] genes = new int[32];
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 32; i++)
       genes[i] = (int) (Math.random() * 8);
-    }
     Arrays.sort(genes);
     return genes;
   }
 
   private int[] copyGenes(int[] copiedGenes) {
     int[] genes = new int[32];
-    for (int i = 0; i < 32; i++) {
-      genes[i] = copiedGenes[i];
-    }
+    System.arraycopy(copiedGenes, 0, genes, 0, 32);
+//    for (int i = 0; i < 32; i++) {
+//      genes[i] = copiedGenes[i];
+//    }
     Arrays.sort(genes);
     return genes;
   }
@@ -55,30 +55,27 @@ public class Genes {
     int[] genes = new int[32];
     if (strongerLeft == 1) {
       for (int i = 0; i < 32; i++) {
-        if (i < strongerAmountInt) {
+        if (i < strongerAmountInt)
           genes[i] = strongerGens[i];
-        } else {
+        else
           genes[i] = weakerGens[i];
-        }
       }
     } else {
       for (int i = 0; i < 32; i++) {
-        if (i < 32 - strongerAmountInt) {
+        if (i < 32 - strongerAmountInt)
           genes[i] = weakerGens[i];
-        } else {
+        else
           genes[i] = strongerGens[i];
-        }
       }
     }
     Arrays.sort(genes);
     return genes;
   }
 
-  public boolean checkIfIdenticalGenes(int[] genes){
+  public boolean checkIfIdenticalGenes(int[] genes) {
     for (int i = 0; i < 32; i++) {
-      if(this.animalGenes[i]!=genes[i]){
+      if (this.animalGenes[i] != genes[i])
         return false;
-      }
     }
     return true;
   }

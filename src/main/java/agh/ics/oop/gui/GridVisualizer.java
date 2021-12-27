@@ -4,22 +4,19 @@ import agh.ics.oop.*;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 
 public class GridVisualizer {
   private final AbstractWorldMap map;
   private final GridPane grid;
   private final App app;
   private final SimulationEngine engine;
-  private int boxSize = 5;
+  private final int boxSize;
   private final GuiElementBox guiElementBox; // GRASS
 
   public GridVisualizer(AbstractWorldMap map, GridPane grid, App app, SimulationEngine engine, int boxSize) throws FileNotFoundException {
@@ -52,11 +49,11 @@ public class GridVisualizer {
               String strColor = "#2235e3";
               if (!this.map.getAnimalsHightlighted()) {
                 String color = strongest.getAnimalColor();
-                strColor = "#"+color;
+                strColor = "#" + color;
               } else {
                 if (!this.map.checkIfHighlightedOnField(vector)) {
                   String color = strongest.getAnimalColor();
-                  strColor = "#"+color;
+                  strColor = "#" + color;
                 }
               }
               circle.setFill(Color.web(strColor));
@@ -79,8 +76,8 @@ public class GridVisualizer {
 
   private void drawHeader(Vector2d lowerLeft, Vector2d upperRight) {
     Label label = new Label(" y\\x ");
-    label.setPrefWidth(40);
-    label.setPrefHeight(40);
+    label.setPrefWidth(this.boxSize);
+    label.setPrefHeight(this.boxSize);
     this.grid.add(label, 0, 0);
     GridPane.setHalignment(label, HPos.CENTER);
     for (int j = lowerLeft.x; j < upperRight.x + 1; j++) {
