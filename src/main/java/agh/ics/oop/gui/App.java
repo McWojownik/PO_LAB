@@ -98,11 +98,11 @@ public class App extends Application {
       stopStartBorder.setOnAction((e2) -> {
         this.stopStartClick(this.engineBorder, this.borderMap, saveToFileBorder, showDominantBorder, fileNameTextBorder);
       });
-      HBox buttons = new HBox(stopStartBorder, showDominantBorder, fileNameTextBorder, saveToFileBorder);
-      buttons.setSpacing(this.spacing);
+      HBox buttonsBorder = new HBox(stopStartBorder, showDominantBorder, fileNameTextBorder, saveToFileBorder);
+      buttonsBorder.setSpacing(this.spacing);
       this.magicRemainsBorder.setText(String.valueOf(this.borderMap.getMagicRemain()));
-      HBox magicCount = new HBox(new Text("MAGIC REMAIN: "), this.magicRemainsBorder);
-      VBox leftInfo = new VBox(buttons, magicCount, this.dominantGenotypeBorder);
+      HBox magicCountBorder = new HBox(new Text("MAGIC REMAIN: "), this.magicRemainsBorder);
+      VBox leftInfo = new VBox(buttonsBorder, magicCountBorder, this.dominantGenotypeBorder);
 
       // BORDER MAP ELEMENTS
       Button showDominantWrap = new Button("HIGHLIGHT");
@@ -118,15 +118,15 @@ public class App extends Application {
       saveToFileWrap.setOnAction((e2) -> {
         this.saveToFileClick(this.lineChartWrap, fileNameTextWrap);
       });
-      Button stopStart2 = new Button("CHANGE STATE");
-      stopStart2.setOnAction((e2) -> {
+      Button stopStartWrap = new Button("CHANGE STATE");
+      stopStartWrap.setOnAction((e2) -> {
         this.stopStartClick(this.engineWrap, this.wrapMap, saveToFileWrap, showDominantWrap, fileNameTextWrap);
       });
-      HBox buttons2 = new HBox(stopStart2, showDominantWrap, fileNameTextWrap, saveToFileWrap);
-      buttons2.setSpacing(this.spacing);
+      HBox buttonsWrap = new HBox(stopStartWrap, showDominantWrap, fileNameTextWrap, saveToFileWrap);
+      buttonsWrap.setSpacing(this.spacing);
       this.magicRemainsWrap.setText(String.valueOf(this.wrapMap.getMagicRemain()));
-      HBox magicCount2 = new HBox(new Text("MAGIC REMAIN: "), this.magicRemainsWrap);
-      VBox rightInfo = new VBox(buttons2, magicCount2, this.dominantGenotypeWrap);
+      HBox magicCountWrap = new HBox(new Text("MAGIC REMAIN: "), this.magicRemainsWrap);
+      VBox rightInfo = new VBox(buttonsWrap, magicCountWrap, this.dominantGenotypeWrap);
 
       try {
         this.gridVisualizerBorder = new GridVisualizer(this.borderMap, this.gridBorder, this, this.engineBorder, (250-(int) (leftInfo.getHeight())) / height);
