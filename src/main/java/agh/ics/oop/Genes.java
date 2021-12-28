@@ -49,7 +49,7 @@ public class Genes {
     double percentage = (double) (stronger.energy) / ((double) (father.energy) + (double) (mother.energy));
     double strongerAmountDouble = 32 * percentage;
     int strongerAmountInt = (int) strongerAmountDouble;
-    int strongerLeft = (int) (Math.random() * 2); // 0 - SILNIEJSZY DAJE Z PRAWEJ, 1 - SILNIEJSZY DAJE Z LEWEJ
+    int strongerLeft = (int) (Math.random() * 2); // 0 - STRONGER FROM RIGHT, 1 - STRONGER FROM LEFT
     int[] strongerGens = stronger.getGenesArr();
     int[] weakerGens = weaker.getGenesArr();
     int[] genes = new int[32];

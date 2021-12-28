@@ -9,6 +9,8 @@ public interface IWorldMap {
 
   Object objectAt(Vector2d position);
 
+  Animal getStrongestAnimalOnField(Vector2d position);
+
   String getGrassColorOnField(Vector2d position);
 
   boolean canMoveBeyondMap();

@@ -14,9 +14,12 @@ public class Animal implements IMapElement {
   protected int daysAlive = 0;
   protected int numberOfKidsTotal = 0;
   protected int numberOfKidsObserved = 0;
+  protected int numberOfDescendantsObserved = 0;
   protected boolean isUnderObservation = false;
   private int eraDied = 0;
   private boolean highlight = false;
+  protected Animal mother = null;
+  protected Animal father = null;
 
   public Animal(AbstractWorldMap map, Vector2d initialPosition, int startEnergy, Genes genes) {
     this.map = map;
@@ -84,7 +87,16 @@ public class Animal implements IMapElement {
   public void observeStatistics() {
     this.isUnderObservation = true;
     this.numberOfKidsObserved = 0;
+    this.numberOfDescendantsObserved = 0;
     this.map.isObservedAnimalOnMap = true;
+  }
+
+  public int getNumberOfKidsObserved() {
+    return this.numberOfKidsObserved;
+  }
+
+  public int getNumberOfDescendantsObserved() {
+    return this.numberOfDescendantsObserved;
   }
 
   public boolean checkIfIdenticalGenes(Animal animal) {
@@ -93,7 +105,7 @@ public class Animal implements IMapElement {
 
   boolean positionChanged(Vector2d oldPosition, Vector2d newPosition) {
     for (IPositionChangeObserver observer : observers) {
-      observer.positionChanged(oldPosition, newPosition, this); // observer.positionChanged(oldPosition, newPosition) zwraca na ten moment zawsze true
+      observer.positionChanged(oldPosition, newPosition, this);
     }
     return true;
   }
@@ -167,9 +179,5 @@ public class Animal implements IMapElement {
     if (energy < 8 * this.map.startEnergy)
       return "870000";
     return "e8138f";
-  }
-
-  public int getNumberOfKidsObserved() {
-    return this.numberOfKidsObserved;
   }
 }

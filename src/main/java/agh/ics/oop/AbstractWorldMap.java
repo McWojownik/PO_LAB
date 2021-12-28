@@ -24,6 +24,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   protected int deadAnimalsDays = 0;
   protected boolean animalsHighlighted = false;
   protected boolean isObservedAnimalOnMap = false;
+  protected Animal observedAnimal = null;
 
   public AbstractWorldMap(int width, int height, int startEnergy, int moveEnergy, int plantEnergy, int jungleWidth, int jungleHeight, boolean isMagical) {
     this.width = width;
@@ -78,6 +79,10 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
 
   public boolean getIsObservedAnimalOnMap() {
     return this.isObservedAnimalOnMap;
+  }
+
+  public void setObservedAnimal(Animal animal) {
+    this.observedAnimal = animal;
   }
 
   public int averageEnergy() {
@@ -135,6 +140,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     return this.getGrassOnField(position);
   }
 
+  @Override
   public Animal getStrongestAnimalOnField(Vector2d position) {
     LinkedList<Animal> animalsAtPosition = this.animalsHash.get(position);
     if (animalsAtPosition != null) {
@@ -165,6 +171,13 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
     for (int i = animalsList.size() - 1; i >= 0; i--) {
       Animal animal = animalsList.get(i);
       if (animal.isDead()) {
+        // IF YOU WANT ALIVE KIDS, THEN CHANGE COMMENT STYLE IN THESE LINES: 180-185
+//        if (animal.isUnderObservation) {
+//          if (animal.mother != null)
+//            animal.mother.numberOfKidsObserved--;
+//          if (animal.father != null)
+//            animal.father.numberOfKidsObserved--;
+//        }
         this.deadAnimalsDays += animal.daysAlive;
         this.deadAnimalsCount++;
         animal.setEraDied(this.day);
@@ -249,9 +262,13 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
           Animal child = new Animal(this, vector, childEnergy, genes);
           if (mother.isUnderObservation || father.isUnderObservation) {
             child.isUnderObservation = true;
+            if (this.observedAnimal != null)
+              this.observedAnimal.numberOfDescendantsObserved++;
             if (mother.isUnderObservation) mother.numberOfKidsObserved++;
             if (father.isUnderObservation) father.numberOfKidsObserved++;
           }
+          child.mother = mother;
+          child.father = father;
 //          System.out.println(mother.getPosition().toString() + " " + father.getPosition().toString() + " COPULATE ");
 //          System.out.println(animal.getPosition().toString() + " " + child.getPosition() + " " + child.energy + " CHILD ");
           this.place(child);
@@ -420,7 +437,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
   public Animal dominantGenotype() {
     LinkedList<Animal> animalsList = this.getAnimalsList();
     if (animalsList.size() == 0) return null;
-    try{
+    try {
       Animal animal = animalsList.getFirst();
       int best = -1;
       for (Animal animalToCompare : animalsList) {
@@ -434,8 +451,7 @@ public abstract class AbstractWorldMap implements IWorldMap, IPositionChangeObse
         }
       }
       return animal;
-    }
-    catch (ConcurrentModificationException ex){
+    } catch (ConcurrentModificationException ex) {
       throw new ConcurrentModificationException("Something wrong while searching for dominant genotype");
     }
   }

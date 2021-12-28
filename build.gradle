@@ -29,4 +29,5 @@ test {
 application {
     mainClassName = 'agh.ics.oop.World'
     mainClass.set('App')
+    getMainClass().set('agh.ics.oop.World')
 }

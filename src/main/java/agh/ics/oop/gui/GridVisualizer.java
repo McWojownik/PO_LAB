@@ -2,7 +2,6 @@ package agh.ics.oop.gui;
 
 import agh.ics.oop.*;
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -46,21 +45,24 @@ public class GridVisualizer {
             if (obj instanceof Animal) {
               Circle circle = new Circle((int) (this.boxSize / 2), (int) (this.boxSize / 2), (int) (this.boxSize / 2));
               Animal strongest = this.map.getStrongestAnimalOnField(vector);
-              String strColor = "#2235e3";
-              if (!this.map.getAnimalsHightlighted()) {
-                String color = strongest.getAnimalColor();
-                strColor = "#" + color;
-              } else {
-                if (!this.map.checkIfHighlightedOnField(vector)) {
+              String strColor = "#cf7632";
+              if (strongest != null) {
+                if (!this.map.getAnimalsHightlighted()) {
                   String color = strongest.getAnimalColor();
                   strColor = "#" + color;
+                } else {
+                  if (!this.map.checkIfHighlightedOnField(vector)) {
+                    String color = strongest.getAnimalColor();
+                    strColor = "#" + color;
+                  }
+                  else strColor = "#2235e3";
                 }
+                box.setOnMouseClicked((e) -> {
+                  if (!this.engine.getIsRunning())
+                    this.app.changeObservedAnimal(strongest, this.map);
+                });
               }
               circle.setFill(Color.web(strColor));
-              box.setOnMouseClicked((e) -> {
-                if (!this.engine.getIsRunning())
-                  this.app.changeObservedAnimal(strongest, this.map);
-              });
               box.getChildren().add(circle);
             } else {
               box.getChildren().add(this.guiElementBox.getImage());

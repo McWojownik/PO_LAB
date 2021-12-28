@@ -33,16 +33,26 @@ public class FileManager {
   public void writeToFile(XYChart.Series<Number, Number>[] series) {
     try {
       BufferedWriter writer = new BufferedWriter(new FileWriter(this.fileName + ".csv", true));
-      for (int i = 0; i < series[0].getData().size(); i++) {
+      int[] tab = new int[series.length];
+      int length = series[0].getData().size();
+      for (int i = 0; i < length; i++) {
         StringBuilder str = new StringBuilder();
         if (i != 0)
           str.append("\n");
         str.append(i + 1);
+        int index = 0;
         for (XYChart.Series<Number, Number> data : series) {
           str.append(",").append(data.getData().get(i).getYValue());
+          tab[index] += data.getData().get(i).getYValue().intValue();
+          index++;
         }
-        writer.append(String.valueOf(str));
+        writer.append(str);
       }
+      StringBuilder str = new StringBuilder();
+      str.append("\n").append("AVG");
+      for (int number : tab)
+        str.append(",").append(Math.round((double) number / length));
+      writer.append(str);
       writer.close();
     } catch (IOException e) {
       System.out.println("An error occurred.");
